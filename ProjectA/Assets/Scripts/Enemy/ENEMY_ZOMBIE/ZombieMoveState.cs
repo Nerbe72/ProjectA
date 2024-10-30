@@ -7,8 +7,7 @@ public class ZombieMoveState : IState
     Zombie enemy;
     PlayerController player;
 
-    float destinationDistance = 1.4f;
-    float distanceLimit = 10f;
+    
 
     public ZombieMoveState(Zombie _enemy)
     {
@@ -22,14 +21,29 @@ public class ZombieMoveState : IState
 
     public void Update()
     {
+        //사망
+        if (enemy.isDead)
+        {
+            enemy.zombieStateMachine.TransitionTo(enemy.zombieStateMachine.deadState);
+            return;
+        }
 
-        if (enemy.Chase(destinationDistance))
+        //피격
+        if (enemy.isHurt)
+        {
+            enemy.zombieStateMachine.TransitionTo(enemy.zombieStateMachine.hurtState);
+            return;
+        }
+
+        //공격
+        if (enemy.Chase(enemy.destinationDistance))
         {
             enemy.zombieStateMachine.TransitionTo(enemy.zombieStateMachine.attackState);
             return;
         }
 
-        if (enemy.CheckSpawnDistanceOut(distanceLimit))
+        //이동중 특정 거리를 벗어남
+        if (enemy.CheckSpawnDistanceOut(enemy.distanceLimit))
         {
             enemy.ReturnSpawnPoint();
             enemy.zombieStateMachine.TransitionTo(enemy.zombieStateMachine.idleState);

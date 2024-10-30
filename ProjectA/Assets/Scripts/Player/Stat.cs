@@ -7,12 +7,12 @@ using UnityEngine;
 public struct Stat
 {
     public int Health;
-    public int Stamina;
-    public int Mana;
+    public int Souls;
     public int MeleeDefense;
     public int MagicDefense;
     public int MeleeDamage;
     public WeaponData Weapon;
+    public MagicData Magic; 
 }
 
 

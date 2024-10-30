@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1b9ad85d135b5e499b7ccf93d47ae0f, type: 3}
   m_Name: MagicStaff
   m_EditorClassIdentifier: 
-  weaponId: 2000
+  weaponID: 2000
   weaponName: "\uAE30\uBCF8 \uC2A4\uD0DC\uD504"
   weaponImage: {fileID: 21300000, guid: f29f8233e7a3b6847bb9a07a05c70432, type: 3}
   weaponPrefab: {fileID: 3844808660582485764, guid: 4a094bd13a554ce429a71f8ade990f26, type: 3}

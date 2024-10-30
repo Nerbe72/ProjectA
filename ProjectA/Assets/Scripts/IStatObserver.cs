@@ -4,12 +4,24 @@ using UnityEngine;
 
 public interface IStatObserver
 {
-    void OnHealthChanged(int _maxHealth, int _changedHealth);
+    void OnHealthChanged(int _maxHealth, int _changedHealth)
+    {
 
-    void OnStaminaChanged(int _maxStamina, int _changedStamina);
+    }
 
-    void OnManaChanged(int _maxMana, int _changedMana);
+    void OnSoulChanged(int _currentSoul)
+    {
 
-    void OnWeaponChanged(WeaponData _changedWeapon);
+    }
+
+    void OnWeaponChanged(WeaponData _changedWeapon)
+    {
+
+    }
+
+    void OnMagicChanged(MagicData _changedMagic)
+    {
+
+    }
 
 }

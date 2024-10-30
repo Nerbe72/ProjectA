@@ -17,7 +17,7 @@ public class LongSword : MonoBehaviour, IWeapon
 
     public void SetData(WeaponData _data)
     {
-        WeaponID = _data.weaponId;
+        WeaponID = _data.weaponID;
         MeleeDamage = _data.meleeDamage;
         MagicDamage = _data.magicDamage;
     }
@@ -26,7 +26,6 @@ public class LongSword : MonoBehaviour, IWeapon
     {
         if (gameObject.activeSelf)
             weaponCollider.enabled = _t;
-        Debug.Log($"{name} Attack!");
     }
 
     public void OnHand()

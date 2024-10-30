@@ -8,16 +8,8 @@ public class HealthIndicator : MonoBehaviour, IStatObserver
     public static HealthIndicator Instance;
 
     [SerializeField] private Slider health;
-    [SerializeField] private Slider stamina;
-    [SerializeField] private Slider mana;
-
     private Coroutine c_healthHolder;
-    private Coroutine c_staminathHolder;
-    private Coroutine c_manaHolder;
-
     private RectTransform healthRect;
-    private RectTransform staminaRect;
-    private RectTransform manaRect;
 
     private void Awake()
     {
@@ -34,8 +26,6 @@ public class HealthIndicator : MonoBehaviour, IStatObserver
         }
 
         healthRect = health.GetComponent<RectTransform>();
-        staminaRect = stamina.GetComponent<RectTransform>();
-        manaRect = mana.GetComponent<RectTransform>();
     }
 
     private void Start()
@@ -62,30 +52,11 @@ public class HealthIndicator : MonoBehaviour, IStatObserver
         c_healthHolder = StartCoroutine(StatLerp(health, _maxHealth, _changedHealth));
     }
 
-    public void OnStaminaChanged(int _maxStamina, int _changedStamina)
+    public void OnSoulChanged(int _currentSoul)
     {
-        staminaRect.sizeDelta = new Vector2(CalcBarWidth(_maxStamina), healthRect.sizeDelta.y);
-        stamina.maxValue = _maxStamina;
-
-        if (c_staminathHolder != null)
-            StopCoroutine(c_staminathHolder);
-        c_staminathHolder = StartCoroutine(StatLerp(stamina, _maxStamina, _changedStamina));
+        //lerp soul
     }
 
-    public void OnManaChanged(int _maxMana, int _changedMana)
-    {
-        manaRect.sizeDelta = new Vector2(CalcBarWidth(_maxMana), healthRect.sizeDelta.y);
-        mana.maxValue = _maxMana;
-
-        if (c_manaHolder != null)
-            StopCoroutine(c_manaHolder);
-        c_manaHolder = StartCoroutine(StatLerp(mana, _maxMana, _changedMana));
-    }
-
-    public void OnWeaponChanged(WeaponData _changedWeapon)
-    {
-
-    }
 
     private int CalcBarWidth(int _maxValue)
     {

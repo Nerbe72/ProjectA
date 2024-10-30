@@ -8,6 +8,9 @@ public class Zombie : Enemy
 
     [SerializeField] private CapsuleCollider attackCollider;
 
+    public float destinationDistance { get { return 1.4f; } }
+    public float distanceLimit { get { return 10f; } }
+
     private void Awake()
     {
         transform.position = SpawnPoint;
@@ -18,8 +21,11 @@ public class Zombie : Enemy
 
     private void OnEnable()
     {
+        transform.localScale = Vector3.one;
         transform.position = SpawnPoint;
         transform.rotation = SpawnRotation;
+        currentHp = enemyStat.Hp;
+        zombieStateMachine.TransitionTo(zombieStateMachine.idleState);
     }
 
     private void Update()
@@ -47,7 +53,7 @@ public class Zombie : Enemy
         switch (_pattern)
         {
             case EnemyAttack.A:
-                PlayerController.Instance.Hurt(enemyStat.AttackTypes[(int)EnemyAttack.A]);
+                PlayerController.Instance.Hurt(enemyStat, EnemyAttack.A);
                 break;
             default:
                 break;

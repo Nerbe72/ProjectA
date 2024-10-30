@@ -215,9 +215,9 @@ MonoBehaviour:
   totalWeapons:
   - {fileID: 11400000, guid: b20e31d6b7534eb409413b2ba868117a, type: 2}
   - {fileID: 11400000, guid: 53eaec92cd9114844a7636360ca07759, type: 2}
-  optainWeaponId: e8030000d0070000
-  bulletPrefabs:
-  - {fileID: 0}
+  optainWeaponId: d0070000e8030000
+  totalMagics:
+  - {fileID: 11400000, guid: 69f010adbef2b244aaeeb3fcf932355b, type: 2}
 --- !u!1 &516930361
 GameObject:
   m_ObjectHideFlags: 0

@@ -43,17 +43,6 @@ public class KeyManager : MonoBehaviour
             }
         }
     }
-    
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     private string KeyString(int _n)
     {

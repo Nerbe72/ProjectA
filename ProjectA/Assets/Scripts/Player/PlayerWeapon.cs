@@ -27,14 +27,37 @@ public class PlayerWeapon : MonoBehaviour
         currentWeaponIndex = 0;
     }
 
+    private void Start()
+    {
+        InitEquipWeapon();
+    }
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.N))
         {
             SwapWeapon();
-            Debug.Log($"장착한 무기 갯수: {equippedWeaponInstances.Length}, 현재 무기 인덱스: {currentWeaponIndex}\n" +
-                $"현재 들고있는 무기: {WeaponManager.Instance.GetWeaponFromId(equippedWeaponInstances[currentWeaponIndex].GetId())}");
+            //int activeWeaponCount = equippedWeaponInstances.Count(w => w != null);
+            //Debug.Log($"장착한 무기 갯수: {activeWeaponCount}");
+            string name = PlayerStat.Instance.currentWeapon.name;
+            Debug.Log(name);
         }
+    }
+
+    private void InitEquipWeapon()
+    {
+        Dictionary<int, List<int>> optains = WeaponManager.Instance.GetOptainWeapons();
+
+        foreach (int fid in optains.Keys)
+        {
+            int count = optains[fid].Count;
+            for (int i = 0; i < count; i++)
+            {
+                EquipWeapon(Hand.Right, WeaponManager.Instance.GetWeaponFromId(optains[fid][i]));
+            }
+        }
+
+        EquipMagic(WeaponManager.Instance.GetTotalMagicData()[0]);
     }
 
     public void EquipWeapon(Hand _hand, WeaponData _weapon)
@@ -44,8 +67,11 @@ public class PlayerWeapon : MonoBehaviour
         GameObject gameObject = GameObject.Instantiate(_weapon.weaponPrefab.asset);
         IWeapon weapon = gameObject.GetComponent<IWeapon>();
         weapon.SetData(_weapon);
+
+        if (equippedWeaponInstances[currentWeaponIndex] != null) currentWeaponIndex = (currentWeaponIndex + 1) % weaponIndexLimit;
+        Debug.Log(currentWeaponIndex);
         equippedWeaponInstances[currentWeaponIndex] = weapon;
-        
+        Debug.Log(equippedWeaponInstances[currentWeaponIndex]);
         gameObject.transform.parent = _hand == Hand.Left ? LHand.transform : RHand.transform;
         gameObject.transform.localPosition = _hand == Hand.Left ? _weapon.LHandMatchPosition : _weapon.RHandMatchPosition;
         gameObject.transform.localRotation = _weapon.HandMatchRotation;
@@ -53,10 +79,12 @@ public class PlayerWeapon : MonoBehaviour
         SetActiveWeapon();
     }
 
-    //보여줄 무기를 선택
-    public void SetShowenWeapon()
+    public void EquipMagic(MagicData _magic)
     {
+        if (_magic.bulletStyle.asset == null) return;
 
+        PlayerStat.Instance.currentMagic = _magic;
+        PlayerStat.Instance.currentMagicCount = _magic.BulletCount;
     }
 
     public void UnEquipWeapon(int _id)
@@ -76,7 +104,6 @@ public class PlayerWeapon : MonoBehaviour
         Resources.UnloadUnusedAssets();
     }
 
-    //들고있는 무기를 스왑함 A to B / A to null / null to A
     //애니메이션의 중간에 호출
     public void SwapWeapon()
     {
@@ -85,19 +112,12 @@ public class PlayerWeapon : MonoBehaviour
         //장착한 무기의 갯수가 1개 미만인 경우 스킵
         if (activeWeaponCount <= 1) return;
 
-        if (equippedWeaponInstances[currentWeaponIndex] != null)
-        {
-            equippedWeaponInstances[currentWeaponIndex].GetSelf().gameObject.SetActive(false);
-            currentWeaponIndex = (currentWeaponIndex + 1) % weaponIndexLimit;
-        }
+        currentWeaponIndex = (currentWeaponIndex + 1) % weaponIndexLimit;
 
-        if (equippedWeaponInstances[currentWeaponIndex] != null)
-        {
-            equippedWeaponInstances[currentWeaponIndex].GetSelf().gameObject.SetActive(true);
-            PlayerStat.Instance.SetWeapon(equippedWeaponInstances[currentWeaponIndex].GetId());
-        }
+        SetActiveWeapon();
     }
 
+    //현재 무기를 활성화
     public void SetActiveWeapon()
     {
         int count = equippedWeaponInstances.Length;
@@ -106,11 +126,12 @@ public class PlayerWeapon : MonoBehaviour
             if (equippedWeaponInstances[i] != null)
             {
                 equippedWeaponInstances[i].GetSelf().gameObject.SetActive(i == currentWeaponIndex);
+                if (i == currentWeaponIndex) PlayerStat.Instance.SetWeapon(equippedWeaponInstances[i].GetId());
             }
         }
     }
 
-    public void Attack(int _currentWeaponID, bool _t)
+    public void Attack(int _currentWeaponID, bool _isColliderTrue)
     {
         int count = equippedWeaponInstances.Length;
 
@@ -119,7 +140,7 @@ public class PlayerWeapon : MonoBehaviour
             if (equippedWeaponInstances[i] == null) continue;
 
             if (equippedWeaponInstances[i].GetId() == _currentWeaponID)
-                equippedWeaponInstances[i].Attack(_t);
+                equippedWeaponInstances[i].Attack(_isColliderTrue);
         }
     }
 }

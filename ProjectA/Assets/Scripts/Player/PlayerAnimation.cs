@@ -11,6 +11,7 @@ public static class AnimatorHash
     public static readonly int Parry = Animator.StringToHash("Parry");
     public static readonly int AttackType = Animator.StringToHash("AttackType");
     public static readonly int Attack = Animator.StringToHash("Attack");
+    public static readonly int Magic = Animator.StringToHash("Magic");
     public static readonly int Hurt = Animator.StringToHash("Hurt");
     public static readonly int DeadT = Animator.StringToHash("DeadT");
     public static readonly int DeadB = Animator.StringToHash("DeadB");
@@ -50,10 +51,15 @@ public class PlayerAnimation : MonoBehaviour
         animator.SetTrigger(AnimatorHash.Dodge);
     }
 
-    public bool PlayAnimationAttack(bool _isTrue)
+    public bool PlayAnimationAttack(WeaponData _weaponData, bool _isTrue)
     {
+        if (_weaponData == null) return false;
+
         animator.SetInteger(AnimatorHash.AttackType, Random.Range((int) 0, (int)2));
+
         animator.SetBool(AnimatorHash.Attack, _isTrue);
+
+        animator.SetBool(AnimatorHash.Magic, WeaponType.Magic == _weaponData.weaponType);
 
         if (animator.GetCurrentAnimatorStateInfo(0).tagHash == AnimatorHash.Attack)
             return true;

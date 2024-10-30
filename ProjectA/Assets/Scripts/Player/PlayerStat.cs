@@ -12,12 +12,13 @@ public class PlayerStat : MonoBehaviour
     [SerializeField] private Stat stats;
 
     public int currentHealth;
-    public int currentStamina;
-    public int currentMana;
+    public int currentSouls;
     public WeaponData currentWeapon;
+    public MagicData currentMagic;
     public int currentMeleeDamage;
     public int currentMeleeDefense;
     public int currentMagicDefense;
+    public int currentMagicCount;
 
     private List<IStatObserver> observers = new List<IStatObserver>();
 
@@ -27,8 +28,6 @@ public class PlayerStat : MonoBehaviour
 
         //테스트용
         stats.Health = 300;
-        stats.Stamina = 120;
-        stats.Mana = 80;
         Init();
     }
 
@@ -46,11 +45,11 @@ public class PlayerStat : MonoBehaviour
     {
         //currentWeapon = stats.Weapon;
         SetHealth(stats.Health);
-        SetStamina(stats.Stamina);
-        SetMana(stats.Mana);
         SetMeleeDamage(stats.MeleeDamage);
         SetMagicDefense(stats.MeleeDefense);
         SetMagicDefense(stats.MagicDefense);
+        if (currentMagic != null)
+            currentMagicCount = currentMagic.BulletCount;
     }
 
     public void SetHealth(int _hp)
@@ -59,16 +58,20 @@ public class PlayerStat : MonoBehaviour
         BroadcastHealth();
     }
 
-    public void SetStamina(int _st)
+    public void GetSoul(int _souls)
     {
-        currentStamina = _st;
-        BroadcastStamina();
+        currentSouls += _souls;
+        BroadcastSouls();
     }
 
-    public void SetMana(int _ma)
+    public bool UseSoul(int _souls)
     {
-        currentMana = _ma;
-        BroadcastMana();
+        if (currentSouls - _souls <= 0)
+            return false;
+        currentSouls = System.Math.Clamp(currentSouls - _souls, 0, int.MaxValue);
+
+        BroadcastSouls();
+        return true;
     }
 
     public void SetMeleeDamage(int _medmg)
@@ -89,7 +92,7 @@ public class PlayerStat : MonoBehaviour
     public bool SetWeapon(int _weaponId)
     {
         //기존의 무기를 그대로 설정하려 하는 경우 pass
-        if (currentWeapon != null && currentWeapon.weaponId == _weaponId) return true;
+        if (currentWeapon != null && currentWeapon.weaponID == _weaponId) return true;
 
         currentWeapon = WeaponManager.Instance.GetWeaponFromId(_weaponId);
 
@@ -130,19 +133,11 @@ public class PlayerStat : MonoBehaviour
         }
     }
 
-    private void BroadcastStamina()
+    private void BroadcastSouls()
     {
         foreach (var observer in observers)
         {
-            observer.OnStaminaChanged(stats.Stamina, currentStamina);
-        }
-    }
-
-    private void BroadcastMana()
-    {
-        foreach (var observer in observers)
-        {
-            observer.OnManaChanged(stats.Mana, currentMana);
+            observer.OnSoulChanged(currentSouls);
         }
     }
 

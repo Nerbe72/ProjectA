@@ -22,7 +22,7 @@ public class MagicStaff : MonoBehaviour, IWeapon
 
     public void SetData(WeaponData _data)
     {
-        WeaponID = _data.weaponId;
+        WeaponID = _data.weaponID;
         MeleeDamage = _data.meleeDamage;
         MagicDamage = _data.magicDamage;
     }
@@ -30,12 +30,10 @@ public class MagicStaff : MonoBehaviour, IWeapon
     public void Attack(bool _t)
     {
         //탄환 발사
-        if (_t)
-        {
-            //BulletOutFrom에서 생성 후 카메라가 바라보는 방향으로 발사
-            //단, 타겟팅 중인경우 타겟 방향으로 발사
-        }
-        Debug.Log($"{name} Attack!");
+        GameObject bullet = Instantiate(PlayerStat.Instance.currentMagic.bulletStyle.asset);
+        bullet.GetComponent<MagicBullet>().SetTrace(TargetManager.Instance.CurrentTarget, _force:60);
+        bullet.GetComponent<MagicBullet>().SetData(BulletOutFrom.position, cameraManager.main.transform.rotation, _speed:2);
+        Debug.Log("Attack");
     }
 
     public void OnHand()

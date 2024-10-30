@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class WeaponManager : MonoBehaviour
@@ -11,7 +12,7 @@ public class WeaponManager : MonoBehaviour
     //사전 데이터 호출용
     [SerializeField] private List<WeaponData> totalWeapons;
     [SerializeField] private List<int> optainWeaponId;
-    [SerializeField] private List<GameObject> bulletPrefabs; 
+    [SerializeField] private List<MagicData> totalMagics; 
 
     //사전 전제: 모든 무기는 id 1000 이상부터 시작
     //id, data
@@ -43,7 +44,7 @@ public class WeaponManager : MonoBehaviour
         allWeaponDictionary = new Dictionary<int, WeaponData>();
         for (int i = 0; i < totalWeapons.Count; i++)
         {
-            allWeaponDictionary.Add(totalWeapons[i].weaponId, totalWeapons[i]);
+            allWeaponDictionary.Add(totalWeapons[i].weaponID, totalWeapons[i]);
         }
 
         //소지목록 초기화
@@ -79,5 +80,17 @@ public class WeaponManager : MonoBehaviour
         int fid = (int)Mathf.Floor(_id / 1000);
 
         return optainWeapon[fid].Contains(_id);
+    }
+
+    public Dictionary<int, List<int>> GetOptainWeapons()
+    {
+        if (optainWeapon == null) return new Dictionary<int, List<int>>();
+
+        return new Dictionary<int, List<int>>(optainWeapon);
+    }
+
+    public List<MagicData> GetTotalMagicData()
+    {
+        return new List<MagicData>(totalMagics);
     }
 }

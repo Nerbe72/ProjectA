@@ -19,6 +19,7 @@ public class Enemy : MonoBehaviour
 {
     private PlayerController player;
 
+    
     [Tooltip("스폰 위치")] public Vector3 SpawnPoint; //스폰되는 위치. awake시에 설정
     [Tooltip("스폰 회전값")] public Quaternion SpawnRotation; //스폰시 바라보는 방향
 
@@ -28,6 +29,8 @@ public class Enemy : MonoBehaviour
     protected int idFaced = 0;
     protected int idMove = 0;
     protected int idAttack = 0;
+    protected int idHurt = 0;
+    protected int idDead = 0;
 
     protected int currentHp;
     protected int currentDamage;
@@ -36,6 +39,10 @@ public class Enemy : MonoBehaviour
     [SerializeField] protected EnemyData enemyStat;
 
     public bool IsFaced = false;
+    public bool isHurt = false;
+    public bool isDead = false;
+
+    protected bool isHurting = false;
 
     private void Start()
     {
@@ -46,8 +53,16 @@ public class Enemy : MonoBehaviour
         idFaced = Animator.StringToHash("Faced");
         idMove = Animator.StringToHash("Move");
         idAttack = Animator.StringToHash("Attack");
+        idHurt = Animator.StringToHash("Hurt");
+        idDead = Animator.StringToHash("Dead");
+    }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other == null) return;
+        if (!other.CompareTag("PlayerAttack")) return;
 
+        Hurt(player.GetDamageGiven());
     }
 
 #if UNITY_EDITOR
@@ -155,6 +170,17 @@ public class Enemy : MonoBehaviour
         animator.SetTrigger(idFaced);
     }
 
+    public void PlayAnimationDead()
+    {
+        animator.SetTrigger("DeadT");
+        animator.SetBool(idDead, isDead);
+    }
+
+    public void PlayAnimationHurt()
+    {
+        animator.SetTrigger(idHurt);
+    }
+
     public void PlayAnimationWalk()
     {
         animator.SetBool(idMove, agent.desiredVelocity != Vector3.zero);
@@ -171,10 +197,24 @@ public class Enemy : MonoBehaviour
         animator.ResetTrigger(idAttack);
     }
 
-    //패턴에 따라 다른 데미지 유형 및 공격력
     public virtual void Attack(Collider _other, EnemyAttack _pattern = EnemyAttack.A)
     {
 
+    }
+
+    public void SetDead(bool _isTrue)
+    {
+        isDead = _isTrue;
+    }
+
+    public void SetHurt(bool _isTrue)
+    {
+        isHurt = _isTrue;
+    }
+
+    public bool GetHurt()
+    {
+        return isHurt;
     }
 
     //피격
@@ -189,10 +229,37 @@ public class Enemy : MonoBehaviour
 
         currentHp = nextHp;
 
+        SetHurt();
+
         if (currentHp == 0)
         {
             //dead
-            Debug.Log(name + "<color=red> is DEAD</color>");
+            SetDead(true);
         }
+    }
+
+    public void Dead()
+    {
+        gameObject.SetActive(false);
+    }
+
+    public void SetHurt()
+    {
+        isHurt = true;
+    }
+
+    public void ResetHurt()
+    {
+        isHurt = false;
+    }
+
+    public void HoldHurting()
+    {
+        isHurting = true;
+    }
+
+    public void ReleaseHurting()
+    {
+        isHurting = false;
     }
 }

@@ -1,4 +1,6 @@
 
+using System.Xml;
+
 public class ZombieStateMachine
 {
     private Zombie owner;
@@ -10,6 +12,8 @@ public class ZombieStateMachine
     public ZombieIdleState idleState;
     public ZombieMoveState moveState;
     public ZombieAttackState attackState;
+    public ZombieHurtState hurtState;
+    public ZombieDeadState deadState;
     //public IState<T> attackTwoState;
     //public IState<T> attackThreeState;
     //public IState<T> hurtState;
@@ -21,6 +25,8 @@ public class ZombieStateMachine
         idleState = new ZombieIdleState(owner);
         moveState = new ZombieMoveState(owner);
         attackState = new ZombieAttackState(owner);
+        hurtState = new ZombieHurtState(owner);
+        deadState = new ZombieDeadState(owner);
 
         Initialize(idleState);
     }

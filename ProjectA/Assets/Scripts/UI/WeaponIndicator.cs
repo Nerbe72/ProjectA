@@ -24,7 +24,6 @@ public class WeaponIndicator : MonoBehaviour, IStatObserver
             Destroy(this);
             return;
         }
-
     }
 
     private void Start()
@@ -51,18 +50,18 @@ public class WeaponIndicator : MonoBehaviour, IStatObserver
         }
     }
 
-    #region 사용안함
-    public void OnHealthChanged(int _maxHealth, int _changedHealth)
+    public void OnMagicChanged(MagicData _changedMagic)
     {
+        if (_changedMagic == null)
+        {
+            magicFrame.sprite = null;
+            magicFrame.color = Color.clear;
+        }
+        else
+        {
+            magicFrame.sprite = _changedMagic.magicImage;
+            magicFrame.color = Color.white;
+        }
     }
-
-    public void OnManaChanged(int _maxMana, int _changedMana)
-    {
-    }
-
-    public void OnStaminaChanged(int _maxStamina, int _changedStamina)
-    {
-    }
-    #endregion
 
 }
