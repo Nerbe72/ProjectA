@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class SaveManager : MonoBehaviour
@@ -25,11 +26,22 @@ public class SaveManager : MonoBehaviour
             return;
         }
 
-        //call from json
         if (!LoadStatData())
         {
             //Àç»ý¼º
+            currentStat = new Stat();
 
+            currentStat.Health = 800;
+            currentStat.MeleeDamage = 100;
+            currentStat.MeleeDefense = 50;
+            currentStat.MagicDefense = 50;
+            currentStat.Souls = 0;
+            currentStat.WeaponID = 1000;
+            currentStat.MagicID = 10000;
+
+            string jsonData = JsonUtility.ToJson(currentStat);
+            string path = Path.Combine(Application.dataPath + "/Resources/Datas/PlayerStats.json");
+            File.WriteAllText(path, jsonData);
         }
     }
 
@@ -38,15 +50,23 @@ public class SaveManager : MonoBehaviour
     {
         currentStat = new Stat();
 
-        //if no such file : generate and reset
         try
         {
-            string dataPath = "StatData/" + currentSaveSlot;
+            string dataPath = "Datas/PlayerStats";
             var dataJson = Resources.Load<TextAsset>(dataPath);
             currentStat = JsonUtility.FromJson<Stat>(dataJson.text);
+
+            currentStat.Weapon = WeaponManager.Instance.GetWeaponFromId(currentStat.WeaponID);
+            currentStat.Magic = WeaponManager.Instance.GetMagicFromId(currentStat.MagicID);
+
             return true;
         }
         catch { return false; }
+    }
+
+    private void InitStatData()
+    {
+
     }
 
     public Stat GetRegularStat()

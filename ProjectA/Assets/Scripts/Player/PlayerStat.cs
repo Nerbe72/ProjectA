@@ -24,21 +24,14 @@ public class PlayerStat : MonoBehaviour
 
     private void Start()
     {
-        SetStatFromDB();
-
         //테스트용
-        stats.Health = 300;
+        stats = SaveManager.Instance.GetRegularStat();
         Init();
     }
 
     private void OnDestroy()
     {
         observers.Clear();
-    }
-
-    private void SetStatFromDB()
-    {
-        SaveManager.Instance.LoadStatData();
     }
 
     private void Init()

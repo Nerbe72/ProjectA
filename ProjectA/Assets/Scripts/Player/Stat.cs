@@ -12,7 +12,9 @@ public struct Stat
     public int MagicDefense;
     public int MeleeDamage;
     public WeaponData Weapon;
-    public MagicData Magic; 
+    public MagicData Magic;
+    public int WeaponID;
+    public int MagicID;
 }
 
 

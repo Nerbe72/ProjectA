@@ -17,6 +17,7 @@ public class WeaponManager : MonoBehaviour
     //사전 전제: 모든 무기는 id 1000 이상부터 시작
     //id, data
     private Dictionary<int, WeaponData> allWeaponDictionary;
+    private Dictionary<int, MagicData> allMagicDictionary;
 
     //fid:(Floor(id / 1000)), id
     private Dictionary<int, List<int>> optainWeapon;
@@ -40,11 +41,18 @@ public class WeaponManager : MonoBehaviour
     //모든 무기 데이터를 사전에 불러옴
     private void InitDataList()
     {
-        //전체 딕셔너리 초기화
+        //무기 딕셔너리 초기화
         allWeaponDictionary = new Dictionary<int, WeaponData>();
         for (int i = 0; i < totalWeapons.Count; i++)
         {
             allWeaponDictionary.Add(totalWeapons[i].weaponID, totalWeapons[i]);
+        }
+
+        //마법 딕셔너리 초기화
+        allMagicDictionary = new Dictionary<int, MagicData>();
+        for (int i = 0; i < totalMagics.Count; i++)
+        {
+            allMagicDictionary.Add(totalMagics[i].magicID, totalMagics[i]);
         }
 
         //소지목록 초기화
@@ -64,6 +72,11 @@ public class WeaponManager : MonoBehaviour
     public WeaponData GetWeaponFromId(int _id)
     {
         return allWeaponDictionary[_id];
+    }
+
+    public MagicData GetMagicFromId(int _id)
+    {
+        return allMagicDictionary[_id];
     }
 
     public int WeaponIdIndex(int _id)

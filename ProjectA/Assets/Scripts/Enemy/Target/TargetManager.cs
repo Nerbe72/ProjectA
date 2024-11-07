@@ -50,7 +50,7 @@ public class TargetManager : MonoBehaviour
         if (_preInSight)
             AddTargetVisible(_target);
 
-        Debug.Log($"{_target.transform.parent.name} <color=yellow>in Target</color>");
+        //Debug.Log($"{_target.transform.parent.name} <color=yellow>in Target</color>");
     }
 
     public void RemoveTarget(Target _target)
@@ -65,7 +65,7 @@ public class TargetManager : MonoBehaviour
 
         RemoveTargetVisible(_target);
 
-        Debug.Log($"{_target.transform.parent.name} <color=yellow>out Target</color>");
+        //Debug.Log($"{_target.transform.parent.name} <color=yellow>out Target</color>");
     }
 
     public void AddTargetVisible(Target _target)
@@ -75,7 +75,7 @@ public class TargetManager : MonoBehaviour
         if (onSightTargets.Contains(_target)) return;
 
         onSightTargets.Add(_target);
-        Debug.Log($"{_target.transform.parent.name} <color=aqua>in Visible</color>");
+        //Debug.Log($"{_target.transform.parent.name} <color=aqua>in Visible</color>");
     }
 
     public void RemoveTargetVisible(Target _target)
@@ -84,7 +84,7 @@ public class TargetManager : MonoBehaviour
         if (!onSightTargets.Contains(_target)) return;
 
         onSightTargets.Remove(_target);
-        Debug.Log($"{_target.transform.parent.name} <color=aqua>out Visible</color>");
+        //Debug.Log($"{_target.transform.parent.name} <color=aqua>out Visible</color>");
     }
     #endregion
 
@@ -99,7 +99,7 @@ public class TargetManager : MonoBehaviour
         {
             CurrentTarget = onSightTargets[0];
             CurrentTarget.SetIndicatorVisibility(true);
-            Debug.Log($"{CurrentTarget.transform.parent.name} is <color=red>Targeted</color>");
+            //Debug.Log($"{CurrentTarget.transform.parent.name} is <color=red>Targeted</color>");
             return;
         }
 
@@ -121,7 +121,7 @@ public class TargetManager : MonoBehaviour
         CurrentTarget = bestValue;
 
         CurrentTarget.SetIndicatorVisibility(true);
-        Debug.Log($"{CurrentTarget.transform.parent.name} is <color=red>Targeted</color>");
+        //Debug.Log($"{CurrentTarget.transform.parent.name} is <color=red>Targeted</color>");
     }
 
     public void ChangeTarget(Target _target)
@@ -131,14 +131,14 @@ public class TargetManager : MonoBehaviour
         UnSetTarget();
         CurrentTarget = _target;
         CurrentTarget.SetIndicatorVisibility(true);
-        Debug.Log($"Target Changed to <color=magenta>{CurrentTarget.transform.parent.name}</color>");
+        //Debug.Log($"Target Changed to <color=magenta>{CurrentTarget.transform.parent.name}</color>");
     }
 
     public void UnSetTarget()
     {
         if (CurrentTarget == null) return;
 
-        Debug.Log($"{CurrentTarget.transform.parent.name} is <color=magenta>Un</color><color=red>Targeted</color>");
+        //Debug.Log($"{CurrentTarget.transform.parent.name} is <color=magenta>Un</color><color=red>Targeted</color>");
         CurrentTarget.SetIndicatorVisibility(false);
         CurrentTarget = null;
     }

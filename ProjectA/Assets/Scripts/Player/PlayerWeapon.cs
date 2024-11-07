@@ -40,7 +40,6 @@ public class PlayerWeapon : MonoBehaviour
             //int activeWeaponCount = equippedWeaponInstances.Count(w => w != null);
             //Debug.Log($"ÀåÂøÇÑ ¹«±â °¹¼ö: {activeWeaponCount}");
             string name = PlayerStat.Instance.currentWeapon.name;
-            Debug.Log(name);
         }
     }
 
@@ -51,13 +50,13 @@ public class PlayerWeapon : MonoBehaviour
         foreach (int fid in optains.Keys)
         {
             int count = optains[fid].Count;
-            for (int i = 0; i < count; i++)
+            for (int i = count - 1; i >= 0; i--)
             {
                 EquipWeapon(Hand.Right, WeaponManager.Instance.GetWeaponFromId(optains[fid][i]));
             }
         }
 
-        EquipMagic(WeaponManager.Instance.GetTotalMagicData()[0]);
+        EquipMagic(SaveManager.Instance.GetRegularStat().Magic);
     }
 
     public void EquipWeapon(Hand _hand, WeaponData _weapon)
@@ -69,9 +68,8 @@ public class PlayerWeapon : MonoBehaviour
         weapon.SetData(_weapon);
 
         if (equippedWeaponInstances[currentWeaponIndex] != null) currentWeaponIndex = (currentWeaponIndex + 1) % weaponIndexLimit;
-        Debug.Log(currentWeaponIndex);
+
         equippedWeaponInstances[currentWeaponIndex] = weapon;
-        Debug.Log(equippedWeaponInstances[currentWeaponIndex]);
         gameObject.transform.parent = _hand == Hand.Left ? LHand.transform : RHand.transform;
         gameObject.transform.localPosition = _hand == Hand.Left ? _weapon.LHandMatchPosition : _weapon.RHandMatchPosition;
         gameObject.transform.localRotation = _weapon.HandMatchRotation;
