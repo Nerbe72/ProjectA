@@ -21,23 +21,18 @@ public class Scavenger : Enemy
 
     private void InitBT()
     {
-        List<Node> depth3 = new List<Node>();
-        List<Node> depth2 = new List<Node>();
-        List<Node> depth1 = new List<Node>();
-        rootNode = new Sequence(depth1);
 
 
 
-        //depth2
 
-        //depth1
-        ActionNode actionDead = new ActionNode(DoIsDead);
+
+        ActionNode actionDead = new ActionNode(DoDead);
         
-        depth1.Add(actionDead);
+
 
     }
 
-    private NodeStates DoIsDead()
+    private NodeStates DoDead()
     {
         //사망 상태라면 success
 

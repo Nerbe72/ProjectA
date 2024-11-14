@@ -1954,11 +1954,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1010047927}
+  - component: {fileID: 1010047930}
   - component: {fileID: 1010047926}
   - component: {fileID: 1010047925}
   - component: {fileID: 1010047924}
   - component: {fileID: 1010047923}
-  - component: {fileID: 1010047928}
   - component: {fileID: 1010047929}
   m_Layer: 0
   m_Name: Boss
@@ -2078,25 +2078,6 @@ Transform:
   - {fileID: 824529756}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1010047928
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1010047922}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d543fab52888f464c9b3608340d1a692, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SpawnPoint: {x: 0, y: 0, z: 0}
-  SpawnRotation: {x: 0, y: 0, z: 0, w: 0}
-  agent: {fileID: 0}
-  enemyStat: {fileID: 11400000, guid: 97e77b584012e5b48818cc0aa80f1307, type: 2}
-  IsFaced: 0
-  isHurt: 0
-  isDead: 0
 --- !u!95 &1010047929
 Animator:
   serializedVersion: 5
@@ -2118,6 +2099,25 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1010047930
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1010047922}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7df5069a22569ea409a9e9888cf12007, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SpawnPoint: {x: 0, y: 0, z: 0}
+  SpawnRotation: {x: 0, y: 0, z: 0, w: 0}
+  agent: {fileID: 0}
+  enemyStat: {fileID: 11400000, guid: 97e77b584012e5b48818cc0aa80f1307, type: 2}
+  IsFaced: 0
+  isHurt: 0
+  isDead: 0
 --- !u!1 &1040423968
 GameObject:
   m_ObjectHideFlags: 3
