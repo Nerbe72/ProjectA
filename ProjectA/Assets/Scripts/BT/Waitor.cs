@@ -16,13 +16,13 @@ public class Waitor : Node
     {
         time += Time.deltaTime;
 
+        //수초 뒤 success 반환
         if (time >= waitTime)
         {
             time = 0f;
             return NodeStates.SUCCESS;
-        } 
-        //수초 뒤 success 반환
+        }
+
         return NodeStates.FAILURE;
-        
     }
 }

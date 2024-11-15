@@ -9,7 +9,7 @@ public class ConditionNode : Node
     protected Node successNode;
     protected Node failureNode;
 
-    public ConditionNode(Func<bool> _condition, Node _success, Node _failure)
+    public ConditionNode(Func<bool> _condition, Node _success = null, Node _failure = null)
     {
         condition = _condition;
         successNode = _success;
@@ -19,8 +19,14 @@ public class ConditionNode : Node
     public override NodeStates Evaluate()
     {
         if (condition())
+        {
+            if (successNode == null) return NodeStates.FAILURE;
             return successNode.Evaluate();
+        }
         else
+        {
+            if (failureNode == null) return NodeStates.FAILURE;
             return failureNode.Evaluate();
+        }
     }
 }
