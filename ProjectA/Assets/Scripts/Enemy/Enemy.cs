@@ -15,9 +15,10 @@ public enum EnemyAttack
 
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(Animator))]
+[RequireComponent(typeof(CapsuleCollider))]
 public class Enemy : MonoBehaviour
 {
-    private PlayerController player;
+    protected PlayerController player;
 
     
     [Tooltip("스폰 위치")] public Vector3 SpawnPoint; //스폰되는 위치. awake시에 설정
@@ -38,10 +39,13 @@ public class Enemy : MonoBehaviour
 
     [SerializeField] protected EnemyData enemyStat;
 
-    public bool IsFaced = false;
+    public bool isFaced = false;
     public bool isHurt = false;
     public bool isDead = false;
-
+    
+    /// <summary>
+    /// 좀비(only FSM)
+    /// </summary>
     protected bool isHurting = false;
 
     private void Start()
@@ -55,6 +59,7 @@ public class Enemy : MonoBehaviour
         idAttack = Animator.StringToHash("Attack");
         idHurt = Animator.StringToHash("Hurt");
         idDead = Animator.StringToHash("Dead");
+        InitForChild();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -78,8 +83,16 @@ public class Enemy : MonoBehaviour
             Gizmos.color = Color.blue;
             Gizmos.DrawLine(transform.position, transform.position + (player.transform.position - transform.position));
         }
+
+        SpawnPoint = transform.position;
+        SpawnRotation = transform.rotation;
     }
 #endif
+
+    protected virtual void InitForChild()
+    {
+
+    }
 
     private void InitStat()
     {

@@ -10,7 +10,7 @@ public class SkeletonIdleState : IState
     void Update()
     {
         //플레이어를 조우한 경우 따라가기
-        if (enemy.IsFaced)
+        if (enemy.isFaced)
         {
             enemy.SkeletonStateMachine.TransitionTo(enemy.SkeletonStateMachine.moveState);
         }

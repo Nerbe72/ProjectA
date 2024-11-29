@@ -77,10 +77,23 @@ public class CameraManager : MonoBehaviour
 
         for (int i = 0; i < vCams.Count; i++)
         {
-            if (i == _followType)
-                vCams[i].SetActive(true);
-            else
-                vCams[i].SetActive(false);
+            vCams[i].SetActive(i == _followType);
+        }
+    }
+
+    public void OffAllCam()
+    {
+        for (int i = 0; i < vCams.Count; i++)
+        {
+            vCams[i].SetActive(false);
+        }
+    }
+
+    public void ResetCam()
+    {
+        for (int i = 0; i < vCams.Count; i++)
+        {
+            vCams[i].SetActive(i == 0);
         }
     }
 }

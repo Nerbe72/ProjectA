@@ -47,6 +47,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float RunMultiply;
     [SerializeField] private float DodgeSpeed;
 
+    private bool refuseAllInput = false;
 
     WaitForSeconds dodgeWorkTime = new WaitForSeconds(0.15f);
     WaitForSeconds hurtWait = new WaitForSeconds(1f);
@@ -87,6 +88,8 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        if (refuseAllInput) return;
+
         ReadInputDodge();
         ReadInputAttack();
     }
@@ -94,6 +97,9 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         CheckGround();
+
+        if (refuseAllInput) return;
+
         Rotation();
         Move();
         Dodge();
@@ -236,6 +242,17 @@ public class PlayerController : MonoBehaviour
         }
 
         return damageGiven;
+    }
+
+    public void SetRefuseInput()
+    {
+        refuseAllInput = true;
+        Debug.Log("Refuse");
+    }
+
+    public void UnSetRefuseInput()
+    {
+        refuseAllInput = false;
     }
 
     private void Dead()
