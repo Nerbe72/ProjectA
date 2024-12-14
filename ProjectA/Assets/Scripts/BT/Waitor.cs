@@ -4,12 +4,15 @@ using UnityEngine;
 
 public class Waitor : Node
 {
+    Node node;
+
     float waitTime = 0f;
     float time = 0;
 
-    public Waitor(float _t)
+    public Waitor(float _waitTime, Node _node = null)
     {
-        waitTime = _t;
+        waitTime = _waitTime;
+        node = _node;
     }
 
     public override NodeStates Evaluate()
@@ -20,9 +23,10 @@ public class Waitor : Node
         if (time >= waitTime)
         {
             time = 0f;
-            return NodeStates.SUCCESS;
+            if (node != null) return node.Evaluate();
+            return NodeStates.FAILURE;
         }
 
-        return NodeStates.FAILURE;
+        return NodeStates.SUCCESS;
     }
 }

@@ -20,12 +20,12 @@ public class ConditionNode : Node
     {
         if (condition())
         {
-            if (successNode == null) return NodeStates.FAILURE;
+            if (successNode == null) return NodeStates.RUNNING;
             return successNode.Evaluate();
         }
         else
         {
-            if (failureNode == null) return NodeStates.FAILURE;
+            if (failureNode == null) return NodeStates.RUNNING;
             return failureNode.Evaluate();
         }
     }

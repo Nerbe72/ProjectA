@@ -19,23 +19,24 @@ public class FogWall : Interact
 
     private void Awake()
     {
-        if (connection == MapConnection.SelectedConnection)
-        {
-            var player = PlayerController.Instance;
-            var playerCC = player.GetComponent<CharacterController>();
+        if (connection != MapConnection.SelectedConnection) return;
 
-            CameraManager.Instance.main.transform.position = destination.position + new Vector3(0, 2, 2);
-            playerCC.enabled = false;
-            player.transform.position = destination.position;
-            player.transform.rotation = destination.rotation;
-            playerCC.enabled = true;
+        var player = PlayerController.Instance;
+        var playerCC = player.GetComponent<CharacterController>();
 
-            playerCC.velocity.Set(0, 0, 0);
-        }
+        CameraManager.Instance.main.transform.position = destination.position + new Vector3(0, 2, 2);
+        playerCC.enabled = false;
+        player.transform.position = destination.position;
+        PlayerController.Instance.ResetRotation(destination.rotation);
+        Debug.Log($"player {player.transform.rotation} / dest {destination.rotation}");
+        playerCC.enabled = true;
+
+        playerCC.velocity.Set(0, 0, 0);
     }
 
     protected override void DoAction()
     {
+        
         MapConnection.SelectedConnection = connection;
         SceneManager.LoadScene(nextScene.ToString());
     }

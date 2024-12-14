@@ -5,6 +5,7 @@ using UnityEngine.Playables;
 
 public class CutSceneTrigger : MonoBehaviour
 {
+    [SerializeField] private Enemy owner;
     [SerializeField] private PlayableDirector cutScene;
 
     PlayerController playerController;
@@ -19,6 +20,8 @@ public class CutSceneTrigger : MonoBehaviour
         playerController = other.GetComponent<PlayerController>();
         playerController.SetRefuseInput();
         CameraManager.Instance.OffAllCam();
+        owner.SetCutscene();
+        owner.SetFaced();
         cutScene.Play();
     }
 
@@ -26,7 +29,11 @@ public class CutSceneTrigger : MonoBehaviour
     {
         if (playerController != null)
             playerController.UnSetRefuseInput();
+        else
+            PlayerController.Instance.UnSetRefuseInput();
         CameraManager.Instance.ResetCam();
+        owner.ResetCutscene();
+        
     }
 
     private void OnTriggerExit(Collider other)

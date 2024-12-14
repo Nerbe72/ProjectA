@@ -42,7 +42,8 @@ public class Enemy : MonoBehaviour
     public bool isFaced = false;
     public bool isHurt = false;
     public bool isDead = false;
-    
+    protected bool isCutscene = false;
+
     /// <summary>
     /// 좀비(only FSM)
     /// </summary>
@@ -111,6 +112,9 @@ public class Enemy : MonoBehaviour
         return _dist <= Vector3.Distance(SpawnPoint, transform.position);
     }
 
+    /// <summary>
+    /// for zombie fsm
+    /// </summary>
     public bool Chase(float _dist = 0.1f)
     {
         LookPlayer();
@@ -122,7 +126,6 @@ public class Enemy : MonoBehaviour
             return true;
         }
 
-        agent.isStopped = false;
         agent.destination = player.transform.position;
         return false;
     }
@@ -220,11 +223,6 @@ public class Enemy : MonoBehaviour
         isDead = _isTrue;
     }
 
-    public void SetHurt(bool _isTrue)
-    {
-        isHurt = _isTrue;
-    }
-
     public bool GetHurt()
     {
         return isHurt;
@@ -233,6 +231,7 @@ public class Enemy : MonoBehaviour
     //피격
     public void Hurt((int melee, int magic) _taken)
     {
+        Debug.Log("Hurt");
         //가할 수 있는 최대 데미지: 1000. 단, 방어력이 -가 된 경우 1000 초과 가능
         int takeMelee = (int)Mathf.Floor(_taken.melee * (1 - (enemyStat.MeleeDefense / (1000 + enemyStat.MeleeDefense))));
         //가할 수 있는 최대 데미지: 1100. 단, 마법방어력이 -가 된 경우 1100 초과 가능
@@ -247,6 +246,7 @@ public class Enemy : MonoBehaviour
         if (currentHp == 0)
         {
             //dead
+            ResetHurt();
             SetDead(true);
         }
     }
@@ -274,5 +274,20 @@ public class Enemy : MonoBehaviour
     public void ReleaseHurting()
     {
         isHurting = false;
+    }
+
+    public void SetFaced()
+    {
+        isFaced = true;
+    }
+
+    public void SetCutscene()
+    {
+        isCutscene = true;
+    }
+
+    public void ResetCutscene()
+    {
+        isCutscene = false;
     }
 }

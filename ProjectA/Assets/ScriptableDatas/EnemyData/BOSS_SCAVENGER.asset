@@ -14,13 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: 
   IsBoss: 1
-  sightAngle: 41
-  sightDistance: 9.24
+  sightAngle: 0
+  sightDistance: 0
   sightHeight: {x: 0, y: 0, z: 0}
-  Hp: 0
-  MeleeDamage: 0
-  MeleeDef: 0
-  MagicDamage: 0
-  MagicDef: 0
+  Hp: 2300
+  AttackTypes: []
+  MeleeDefense: 0
+  MagicDefense: 0
   StartWithSit: 0
   PatternCount: 0

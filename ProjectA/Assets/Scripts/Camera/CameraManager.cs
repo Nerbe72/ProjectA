@@ -34,6 +34,8 @@ public class CameraManager : MonoBehaviour
         }
 
         SceneManager.sceneLoaded += ChangeCameraToMain;
+        SceneManager.sceneLoaded += ResetMousePosition;
+        SceneManager.sceneLoaded += ResetCameraPosition;
     }
 
     private void OnDestroy()
@@ -44,6 +46,14 @@ public class CameraManager : MonoBehaviour
     private void ChangeCameraToMain(Scene _scene, LoadSceneMode _mode)
     {
         main = Camera.main;
+    }
+
+    public void ResetCameraPosition(Scene _scene, LoadSceneMode _mode)
+    {
+        for (int i = 0; i < vCams.Count; i++)
+        {
+            vCams[i].GetComponent<CinemachineVirtualCamera>().ForceCameraPosition(PlayerController.Instance.transform.position, PlayerController.Instance.transform.rotation);
+        }
     }
 
     public void ResetMousePosition(Scene _scene, LoadSceneMode _mode)

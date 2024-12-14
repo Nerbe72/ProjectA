@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
@@ -247,7 +248,6 @@ public class PlayerController : MonoBehaviour
     public void SetRefuseInput()
     {
         refuseAllInput = true;
-        Debug.Log("Refuse");
     }
 
     public void UnSetRefuseInput()
@@ -260,6 +260,11 @@ public class PlayerController : MonoBehaviour
         playerAnimation.PlayDead();
     }
     #endregion
+
+    public void ResetRotation(Quaternion _rotate)
+    {
+        transform.rotation = _rotate;
+    }
 
     #region AnimationEvents
     public void HoldDodging()
