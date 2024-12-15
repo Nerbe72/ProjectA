@@ -27,7 +27,7 @@ public class ZombieAttackState : IState
 
         if (enemy.IsAnimationAttack())
         {
-            enemy.ResetAttackTrigger();
+            enemy.ResetAttack();
             return;
         }
 

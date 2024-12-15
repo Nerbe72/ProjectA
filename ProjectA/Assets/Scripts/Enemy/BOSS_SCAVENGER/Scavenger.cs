@@ -3,6 +3,7 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.AI;
 
 public enum ScavengerAttackType
 {
@@ -21,50 +22,44 @@ public enum ScavengerPattern
 
 public class Scavenger : Enemy
 {
-    private Sequence rootNode;
+    private Node rootNode;
     private ScavengerPattern prePattern = ScavengerPattern.Chase;
 
-    private bool firstMet; //for cutscene
-    private bool isChase;
-    private bool isIdle;
-    private bool isAttack;
-    private bool isRetreating;
+    private bool isChase = false;
+    private bool isAttack = false;
+    private bool isRetreating = false;
+    private bool isMovingRight = true;
+    private bool isEvading = false;
 
     private Vector3 targetPosition;
 
-    private float moveTime = 0f;
+    private float sideWalkChangeTime = 0f;
+    private float lastAttackTime = 0f;
+    private float lastPatternChangeTime = 0f;
 
-    [SerializeField] private List<CapsuleCollider> attackCollider;
+    [SerializeField] private List<CapsuleCollider> attackColliders;
 
     [Header("공격 패턴 거리")]
-    [SerializeField] private float attackALess;
-    [SerializeField] private float attackBOver;
+    [SerializeField][Tooltip("근거리 공격 범위 (1.8)")] private float meleeRange;
+    [SerializeField][Tooltip("원거리 공격 범위 (1.9)")] private float rangedRange;
+
     [Header("패턴 시간")]
-    [SerializeField][Tooltip("회피동작 소요시간")] private float retreatingInterval;
-    [SerializeField][Tooltip("후퇴동작 소요시간")] private float backwardInterval;
-    [SerializeField][Tooltip("공격패턴 변경 대기시간")] private float attackWaitInterval;
-    [SerializeField][Tooltip("랜덤패턴 변경 대기시간(추격)")] private float randomWait1Interval;
-    [SerializeField][Tooltip("랜덤패턴 변경 대기시간(후퇴)")] private float randomWait2Interval;
-    [SerializeField][Tooltip("사이드 스텝 방향 변경 대기시간")] private float sideWalkInterval;
+    [SerializeField][Tooltip("공격 시도 간격 (2.0)")] private float attackInterval;
+    [SerializeField][Tooltip("패턴 변경 시간 (1.0)")] private float patternCooldownTime;
+    [SerializeField][Tooltip("회피 지속 시간 (0.5)")] private float evadeDuration;
+    [SerializeField][Tooltip("사이드 스텝 방향 변경 대기시간 (1.0)")] private float sideWalkInterval;
+
     [Header("패턴 속도")]
-    [SerializeField][Tooltip("회피 속도")] private float retreatSpeed;
-    [SerializeField][Tooltip("후퇴 속도")] private float backwardSpeed;
-    [SerializeField][Tooltip("원거리 공격 추격 속도")] private float attackBSpeed;
-    [SerializeField][Tooltip("추격 속도")] private float chaseSpeed;
-    [SerializeField][Tooltip("좌우 이동대기 속도")] private float sidewalkSpeed;
-    [Header("공격 쿨타임")]
-    [SerializeField][Tooltip("공격 A 쿨타임")] private float attackACooldown;
-    [SerializeField][Tooltip("공격 B 쿨타임")] private float attackBCooldown;
+    [SerializeField][Tooltip("후퇴 속도 (0.4)")] private float retreatSpeed;
+    [SerializeField][Tooltip("추격 속도 (3.5)")] private float chaseSpeed;
+    [SerializeField][Tooltip("좌우 이동 속도 (0.5)")] private float sidewalkSpeed;
+    [SerializeField][Tooltip("회피 동작 속도 (8.0)")] private float evadeSpeed;
+
     [Header("Debug")]
     [SerializeField] private TMP_Text text;
 
-    private bool isMovingRight = true;
-    private float sideWalkTimer = 0f;
-
-    private float lastAttackATime = 0f;
-    private float lastAttackBTime = 0f;
-    private bool CanAttackA => (Time.time - lastAttackATime) >= attackACooldown;
-    private bool CanAttackB => (Time.time - lastAttackBTime) >= attackBCooldown;
+    private bool CanAttack => Time.time - lastAttackTime >= attackInterval;
+    private bool CanChangePattern => Time.time - lastPatternChangeTime >= patternCooldownTime;
 
     public static class ScavengerHash
     {
@@ -90,7 +85,8 @@ public class Scavenger : Enemy
             Hurt((99999, 99999));
         }
 
-        rootNode.Evaluate();
+        if (!isCutscene)
+            rootNode.Evaluate();
 
         Vector3 localVelocity = transform.InverseTransformDirection(agent.velocity);
         animator.SetFloat(ScavengerHash.Side, Mathf.Lerp(animator.GetFloat(ScavengerHash.Side), localVelocity.x, Time.deltaTime * 3f));
@@ -100,289 +96,214 @@ public class Scavenger : Enemy
     protected override void InitForChild()
     {
         agent.acceleration = float.MaxValue;
-        InitBT();
+        //InitBT();
+        rootNode = CreateBT();
     }
 
-    private void InitBT()
+    private Node CreateBT()
     {
-        List<Node> mainNodes = new List<Node>();
-
-        #region 사망
-        ActionNode deadAction = new ActionNode(DoDead);
-        ConditionNode isDeadCondition = new ConditionNode(IsDead, deadAction, null);
-        #endregion 사망
-
-        #region 컷씬
-        ActionNode stayAction = new ActionNode(DoStay);
-        ConditionNode isCutsceneCondition = new ConditionNode(IsCutScene, stayAction, null);
-        #endregion 컷씬
-
-        mainNodes.Add(isDeadCondition);
-        mainNodes.Add(isCutsceneCondition);
-        mainNodes.Add(AttackAndRetreat());
-        mainNodes.Add(Move());
-
-        rootNode = new Sequence(mainNodes);
-    }
-
-    private Node AttackAndRetreat()
-    {
-        // 공격/피격
-        List<Node> attackNodes = new List<Node>();
-
-        #region 피격
-        List<Node> retreatNodes = new List<Node>();
-        ActionNode isHurtedAction = new ActionNode(IsHurted);
-        Waitor retreatWaitor = new Waitor(retreatingInterval);
-        ActionNode retreatAction = new ActionNode(DoRetreat);
-
-        retreatNodes.Add(isHurtedAction);
-        retreatNodes.Add(retreatWaitor);
-        retreatNodes.Add(retreatAction);
-
-        Sequence retreatSequence = new Sequence(retreatNodes);
-        #endregion 피격
-
-        ActionNode resetHurtRetreatAction = new ActionNode(ResetHurtRetreat);
-        Waitor attackWaitor = new Waitor(attackWaitInterval);
-
-        #region 공격
-
-        ActionNode attackAAction = new ActionNode(AttackA);
-        ConditionNode isLessCondition = new ConditionNode(() => { return DistanceToPlayer() <= attackALess + 0.1f && CanAttackA; }, attackAAction, null);
-        ActionNode attackBAction = new ActionNode(AttackB);
-        ConditionNode isOverCondition = new ConditionNode(() => { return DistanceToPlayer() > attackBOver - attackALess && CanAttackB; }, attackBAction, isLessCondition);
-
-        //List<Node> lessDistNodes = new List<Node>();
-        //List<Node> overDistNodes = new List<Node>();
-
-        //ActionNode attackAAction = new ActionNode(AttackA);
-        //ConditionNode isLessCondition = new ConditionNode(() => {return DistanceToPlayer() <= attackALess + 0.1f; }, attackAAction, null); //debug
-
-        //ActionNode attackBAction = new ActionNode(AttackB);
-
-        //ConditionNode isOverCondition = new ConditionNode(() => { return DistanceToPlayer() > attackBOver - attackALess; }, attackBAction, isLessCondition);
-        #endregion 공격
-
-        attackNodes.Add(retreatSequence);
-        attackNodes.Add(resetHurtRetreatAction);
-        attackNodes.Add(attackWaitor);
-        attackNodes.Add(isOverCondition);
-
-        Selector attackSelector = new Selector(attackNodes);
-        ConditionNode isAttackingCondition = new ConditionNode(IsAttacking, null, attackSelector);
-
-        return isAttackingCondition;
-    }
-
-    private Node Move()
-    {
-        //이동
-        List<Node> random1Nodes = new List<Node>();
-        List<Node> random2Nodes = new List<Node>();
-        ActionNode randomChaseAction = new ActionNode(DoChase);
-        ActionNode randomSideWalkNCAction = new ActionNode(DoSideWalk);
-
-        ActionNode randomSideWalkNBAction = new ActionNode(DoSideWalk);
-        ActionNode randomBackwardAction = new ActionNode(DoBackward);
-
-        random1Nodes.Add(randomChaseAction);
-        random1Nodes.Add(randomSideWalkNCAction);
-
-        random2Nodes.Add(randomSideWalkNBAction);
-        random2Nodes.Add(randomBackwardAction);
-
-        RandomSelector random1Selector = new RandomSelector(random1Nodes, randomWait1Interval);
-        RandomSelector random2Selector = new RandomSelector(random2Nodes, randomWait2Interval);
-
-        ConditionNode isDistOverCondition = new ConditionNode(() => { return DistanceToPlayer() >= (attackBOver - attackALess); }, random1Selector, null);
-
-        ConditionNode randomLessCondition = new ConditionNode(IsDistLessForRandom, random2Selector, isDistOverCondition);
-        ConditionNode isAttackAndRetreatCondition = new ConditionNode(IsAttackRetreat, null, randomLessCondition);
-
-        return isAttackAndRetreatCondition;
-    }
-
-    private bool IsDistLessForRandom()
-    {
-        return DistanceToPlayer() <= Random.Range(attackALess - 0.05f, attackBOver + 0.06f);
-    }
-
-    private NodeStates ResetHurtRetreat()
-    {
-        isHurt = false;
-        if (isRetreating) return NodeStates.SUCCESS;
-        return NodeStates.FAILURE;
-    }
-
-    private bool IsAttackRetreat()
-    {
-        if (isAttack || isRetreating) return true;
-        return false;
-    }
-
-    private NodeStates AttackA()
-    {
-        //초근접 공격
-        agent.velocity = Vector3.zero;
-        agent.SetDestination(transform.position);
-        animator.SetInteger(ScavengerHash.AttackType, (int)ScavengerAttackType.A);
-        animator.SetTrigger(ScavengerHash.Attack);
-        isAttack = true;
-        text.text = "<color=red>Attack A</color>";
-
-        lastAttackATime = Time.time;
-
-        return NodeStates.SUCCESS;
-    }
-
-    private NodeStates AttackB()
-    {
-        //약근접 공격
-        animator.SetInteger(ScavengerHash.AttackType, (int)ScavengerAttackType.B);
-        animator.SetTrigger(ScavengerHash.Attack);
-        isAttack = true;
-        agent.updateRotation = true;
-        agent.speed = attackBSpeed;
-
-        Vector3 linear = (player.transform.position - transform.position).normalized;
-        Vector3 targetPosition = player.transform.position - (linear * (attackALess - 0.1f));
-        agent.SetDestination(targetPosition);
-        text.text = "<color=red>Attack B</color>";
-
-        lastAttackBTime = Time.time;
-
-        return NodeStates.SUCCESS;
-    }
-
-    private NodeStates DoSideWalk()
-    {
-        //해당 위치에서 플레이어를 바라보며 좌 우로 이동
-        //플레이어와 본인간 직선을 긋고 수직 방향으로 이동
-        agent.updateRotation = false;
-        agent.speed = sidewalkSpeed;
-
-        Vector3 direction = (player.transform.position - transform.position).normalized;
-
-        transform.rotation = Quaternion.LookRotation(direction);
-
-        //양쪽 방향 벡터
-        Vector3 left = Vector3.Cross(transform.up, direction).normalized;
-        Vector3 right = Vector3.Cross(direction, transform.up).normalized;
-        Vector3 finalDirection;
-
-        //좌우측 선택
-        sideWalkTimer += Time.deltaTime;
-        if (sideWalkTimer >= sideWalkInterval)
+        return new Selector(new List<Node>
         {
-            isMovingRight = !isMovingRight;
-            sideWalkTimer = 0f;
+            new Sequence(new List<Node>
+            {
+                new ActionNode(CheckIsDead),
+                new ActionNode(DoNothing)
+            }),
+            new Sequence(new List<Node>
+            {
+                new ActionNode(AttemptAttack),
+                new Selector(new List<Node>
+                {
+                    new ActionNode(PerformMeleeAttack),
+                    new ActionNode(PerformRangedAttack)
+                })
+            }),
+            new Sequence(new List<Node>
+            {
+                new ActionNode(CheckIsAttacking),
+                new RandomSelector(new List<Node>
+                {
+                    new ActionNode(DoRetreat),
+                    new ActionNode(DoSideWalk),
+                    new ActionNode(DoChase)
+                }),
+                new Sequence(new List<Node>
+                {
+                    new ActionNode(PatternCooldown)
+                })
+            })
+        });
+    }
+
+    private NodeStates CheckIsAttacking()
+    {
+        if (isAttack)
+        {
+            Debug.Log("Attacking");
+            return NodeStates.FAILURE;
         }
-
-        if (isMovingRight)
-            finalDirection = right;
-        else
-            finalDirection = left;
-
-        agent.SetDestination(transform.position + finalDirection);
-        text.text = "<color=blue>Sidewalk</color>";
-        return NodeStates.FAILURE;
+        return NodeStates.SUCCESS;
     }
 
-    private NodeStates DoChase()
+    private NodeStates CheckIsDead()
     {
-        if (prePattern == ScavengerPattern.Backward) return NodeStates.FAILURE;
-        //특정 거리까지 추격
-        isChase = true;
-        agent.updateRotation = true;
-        agent.speed = chaseSpeed;
-
-        Vector3 linear = (player.transform.position - transform.position).normalized;
-        Vector3 targetPosition = player.transform.position - (linear * (attackALess - 0.1f));
-        agent.SetDestination(targetPosition);
-        text.text = "<color=green>Chase</color>";
-        return NodeStates.FAILURE;
-    }
-
-    private NodeStates DoRetreat()
-    {
-        if (prePattern == ScavengerPattern.Chase) return NodeStates.FAILURE;
-        //회피 행동
-        //플레이어를 바라본 상태로
-        agent.updateRotation = false;
-
-        Vector3 targetDir = (player.transform.position - transform.position).normalized;
-
-        agent.speed = retreatSpeed;
-        agent.SetDestination(transform.position - targetDir);
-        transform.rotation = Quaternion.LookRotation(targetDir);
-        
-        text.text = "<color=yellow>Retreat</color>";
-        return NodeStates.FAILURE;
-    }
-
-    private NodeStates DoBackward()
-    {
-        agent.updateRotation = false;
-
-        Vector3 targetDir = (player.transform.position - transform.position).normalized;
-
-        agent.speed = 1.5f;
-        agent.SetDestination(transform.position - targetDir);
-        transform.rotation = Quaternion.LookRotation(targetDir);
-
-        text.text = "<color=yellow>Backward</color>";
-        return NodeStates.FAILURE;
-    }
-
-    private bool IsAttacking()
-    {
-        //공격중인지 체크
-        return isAttack;
-    }
-
-    private NodeStates IsHurted()
-    {
-        //피격되었는지 확인
-        if (isHurt)
+        if (isDead)
         {
-            animator.SetTrigger(ScavengerHash.Hurt);
             return NodeStates.SUCCESS;
         }
         return NodeStates.FAILURE;
     }
 
-    private NodeStates DoStay()
+    private NodeStates DoNothing()
     {
-        //대기(아무 행동도 하지 않음) 해당 위치에서 BT 종료
-        text.text = "CutScene Playing";
+        // 아무 동작도 하지 않음
+        text.text = "<color=grey>Cutscene</color>";
+        return NodeStates.RUNNING;
+    }
+
+    private NodeStates AttemptAttack()
+    {
+        if (CanAttack)
+        {
+            return NodeStates.SUCCESS;
+        }
         return NodeStates.FAILURE;
     }
 
-    private bool IsCutScene()
+    private NodeStates PerformMeleeAttack()
     {
-        //컷씬이 재생중인지 확인
-        return isCutscene;
-    }
-
-    private NodeStates DoDead()
-    {
-        //사망
-        isDead = false;
-        PlayAnimationDead();
+        if (DistanceToPlayer() <= meleeRange)
+        {
+            isAttack = true;
+            agent.velocity = Vector3.zero;
+            agent.SetDestination(transform.position);
+            animator.SetInteger(ScavengerHash.AttackType, (int)ScavengerAttackType.A);
+            animator.SetTrigger(ScavengerHash.Attack);
+            lastAttackTime = Time.time;
+            text.text = "<color=red>Perform Melee Attack</color>";
+            // 공격이 끝난 후 타이머를 다시 증가시키기 위해 false로 설정합니다.
+            return NodeStates.RUNNING;
+        }
         return NodeStates.FAILURE;
     }
 
-    private bool IsDead()
+
+    private NodeStates PerformRangedAttack()
     {
-        //사망하였는지(체력 0) 확인
-        return isDead;
+        if (DistanceToPlayer() > rangedRange)
+        {
+            isAttack = true;
+            float distance = DistanceToPlayer();
+            float speed = CalculateRangedAttackSpeed(distance);
+            agent.speed = speed;
+            agent.stoppingDistance = 1.5f; // 플레이어와 겹치지 않게 설정
+            Vector3 targetPosition = player.transform.position;
+            agent.SetDestination(targetPosition);
+            animator.SetInteger(ScavengerHash.AttackType, (int)ScavengerAttackType.B);
+            animator.SetTrigger(ScavengerHash.Attack);
+            lastAttackTime = Time.time;
+            text.text = "<color=red>Perform Ranged Attack</color>";
+            // 공격이 끝난 후 타이머를 다시 증가시키기 위해 false로 설정합니다.
+            return NodeStates.RUNNING;
+        }
+        return NodeStates.FAILURE;
     }
+
+
+
+    private float CalculateRangedAttackSpeed(float distance)
+    {
+        // 도약 시간에 따른 속도 계산
+        return distance / 1.2f; // 애니메이션 동작 시간: 1.2
+    }
+
+    private NodeStates AttemptEvade()
+    {
+        if (isEvading)
+        {
+            agent.speed = evadeSpeed;
+            agent.SetDestination(transform.position - transform.forward * evadeSpeed * evadeDuration);
+            Invoke(nameof(EndEvade), evadeDuration);
+            text.text = "<color=blue>Evade</color>";
+            return NodeStates.RUNNING;
+        }
+        return NodeStates.SUCCESS;
+    }
+
+    private void EndEvade()
+    {
+        isEvading = false;
+    }
+
+    private NodeStates DoRetreat()
+    {
+        agent.updateRotation = false;
+        Vector3 targetDir = (player.transform.position - transform.position).normalized;
+        agent.speed = retreatSpeed;
+        agent.SetDestination(transform.position - targetDir * retreatSpeed);
+        transform.rotation = Quaternion.LookRotation(targetDir);
+        text.text = "<color=yellow>Retreat</color>";
+        Debug.Log("Retreat");
+        return NodeStates.SUCCESS;
+    }
+
+
+    private NodeStates DoSideWalk()
+    {
+        agent.updateRotation = false;
+        agent.speed = sidewalkSpeed;
+        Vector3 direction = (player.transform.position - transform.position).normalized;
+        transform.rotation = Quaternion.LookRotation(direction);
+
+        Vector3 left = Vector3.Cross(transform.up, direction).normalized;
+        Vector3 right = Vector3.Cross(direction, transform.up).normalized;
+        Vector3 finalDirection;
+
+        sideWalkChangeTime += Time.deltaTime;
+        if (sideWalkChangeTime >= sideWalkInterval)
+        {
+            isMovingRight = !isMovingRight;
+            sideWalkChangeTime = 0f;
+        }
+
+        finalDirection = isMovingRight ? right : left;
+        agent.SetDestination(transform.position + finalDirection * sidewalkSpeed);
+        text.text = "Side Walk";
+        Debug.Log("Side");
+        return NodeStates.SUCCESS;
+    }
+
+
+    private NodeStates DoChase()
+    {
+        agent.updateRotation = true;
+        agent.speed = chaseSpeed;
+        agent.stoppingDistance = 1.5f; // 플레이어와 겹치지 않게 설정
+
+        Vector3 targetPosition = player.transform.position;
+        agent.SetDestination(targetPosition);
+        text.text = "<color=green>Chase</color>";
+        Debug.Log("Chase");
+        return NodeStates.RUNNING;
+    }
+
+    private NodeStates PatternCooldown()
+    {
+        if (!isAttack && CanChangePattern)
+        {
+            lastPatternChangeTime = Time.time;
+            return NodeStates.SUCCESS;
+        }
+        return NodeStates.FAILURE;
+    }
+
 
     private float DistanceToPlayer()
     {
-        return Vector3.Distance(player.transform.position, transform.position);
+        // 플레이어와의 거리 계산
+        return Vector3.Distance(transform.position, player.transform.position);
     }
+
 
     #region 애니메이션
     public void SetAttacking()
@@ -412,12 +333,20 @@ public class Scavenger : Enemy
 
     public void SetAttackTrigger()
     {
-
+        int count = attackColliders.Count;
+        for(int i = 0; i < count; i++)
+        {
+            attackColliders[i].enabled = true;
+        }
     }
 
     public void ResetAttackTrigger()
     {
-
+        int count = attackColliders.Count;
+        for (int i = 0; i < count; i++)
+        {
+            attackColliders[i].enabled = false;
+        }
     }
     #endregion 애니메이션
 

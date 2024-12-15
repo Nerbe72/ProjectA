@@ -334,6 +334,7 @@ public class PlayerController : MonoBehaviour
 
         playerAnimation.StopDead();
         playerStat.ResetHealth();
+        //스폰할 맵과 위치에 맞춰 조정
         respawn = false;
     }
 

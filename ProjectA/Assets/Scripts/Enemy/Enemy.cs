@@ -208,7 +208,7 @@ public class Enemy : MonoBehaviour
         agent.isStopped = true;
     }
 
-    public void ResetAttackTrigger()
+    public void ResetAttack()
     {
         animator.ResetTrigger(idAttack);
     }
