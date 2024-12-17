@@ -420,7 +420,8 @@ public class Scavenger : Enemy
 
     public void FlagDeath()
     {
-        //오브젝트 제거 및 사망처리
+        //오브젝트 제거 및 사망처리 todo
+        SaveManager.Instance.SaveBossStateData();
     }
 
     private IEnumerator HpBarLerp()

@@ -303,7 +303,7 @@ GameObject:
   - component: {fileID: 72381936}
   - component: {fileID: 72381938}
   - component: {fileID: 72381937}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -351,8 +351,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: To Boss
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 83f0c6e162a1ad944830b23bf16b9d03, type: 2}
+  m_sharedMaterial: {fileID: -1208177258039747432, guid: 83f0c6e162a1ad944830b23bf16b9d03, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -376,15 +376,15 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 2.5
+  m_fontSize: 2.45
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
   m_fontSizeMin: 0.5
   m_fontSizeMax: 72
-  m_fontStyle: 1
-  m_HorizontalAlignment: 1
-  m_VerticalAlignment: 256
+  m_fontStyle: 0
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -441,7 +441,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  - {fileID: -1208177258039747432, guid: 83f0c6e162a1ad944830b23bf16b9d03, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -583,7 +583,7 @@ MonoBehaviour:
   m_DistanceLimit: 0
   m_MinimumOcclusionTime: 0
   m_CameraRadius: 0.1
-  m_Strategy: 1
+  m_Strategy: 0
   m_MaximumEffort: 4
   m_SmoothingTime: 0
   m_Damping: 0
@@ -894,7 +894,7 @@ GameObject:
   - component: {fileID: 145007057}
   - component: {fileID: 145007056}
   - component: {fileID: 145007058}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: FogWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7021,8 +7021,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 300482837}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.005211011, y: -0.13356984, z: -0.00070233684, w: 0.9910255}
-  m_LocalPosition: {x: -0.08165118, y: 1.7098387, z: -9.642639}
+  m_LocalRotation: {x: -0.0019122502, y: 0.4072547, z: 0.00085269107, w: 0.91331226}
+  m_LocalPosition: {x: 11.16102, y: 1.773125, z: 0.45720142}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -7735,7 +7735,7 @@ GameObject:
   - component: {fileID: 397206173}
   - component: {fileID: 397206174}
   - component: {fileID: 397206175}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Interact
   m_TagString: Interact
   m_Icon: {fileID: 0}
@@ -7795,7 +7795,7 @@ MonoBehaviour:
   type: 1
   ShownFrame: {fileID: 1060015721}
   ShownText: {fileID: 1515488000}
-  ShownString: "\uC548\uAC1C\uC758 \uBCBD\uC744 \uD1B5\uACFC\uD55C\uB2E4"
+  ShownString: "F: \uC548\uAC1C\uC758 \uBCBD\uC744 \uD1B5\uACFC\uD55C\uB2E4"
   connection: {fileID: 11400000, guid: b42ffd5d818d8e94c84f4fd78cae073e, type: 2}
   nextScene: 1
   destination: {fileID: 1712197723}
@@ -8091,7 +8091,7 @@ GameObject:
   - component: {fileID: 562417659}
   - component: {fileID: 562417658}
   - component: {fileID: 562417657}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: FogWall (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13101,7 +13101,7 @@ GameObject:
   - component: {fileID: 593474898}
   - component: {fileID: 593474900}
   - component: {fileID: 593474899}
-  m_Layer: 5
+  m_Layer: 15
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14243,7 +14243,7 @@ GameObject:
   - component: {fileID: 933900613}
   - component: {fileID: 933900612}
   - component: {fileID: 933900611}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Plane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14348,7 +14348,7 @@ GameObject:
   - component: {fileID: 954188718}
   - component: {fileID: 954188720}
   - component: {fileID: 954188719}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Interact
   m_TagString: Interact
   m_Icon: {fileID: 0}
@@ -14387,7 +14387,7 @@ MonoBehaviour:
   type: 1
   ShownFrame: {fileID: 593474899}
   ShownText: {fileID: 2064086570}
-  ShownString: "\uC548\uAC1C\uC758 \uBCBD\uC744 \uD1B5\uACFC\uD55C\uB2E4"
+  ShownString: "F: \uC548\uAC1C\uC758 \uBCBD\uC744 \uD1B5\uACFC\uD55C\uB2E4"
   connection: {fileID: 11400000, guid: b42ffd5d818d8e94c84f4fd78cae073e, type: 2}
   nextScene: 1
   destination: {fileID: 1758068278}
@@ -14605,7 +14605,7 @@ GameObject:
   - component: {fileID: 1060015720}
   - component: {fileID: 1060015722}
   - component: {fileID: 1060015721}
-  m_Layer: 5
+  m_Layer: 15
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15656,7 +15656,7 @@ GameObject:
   - component: {fileID: 1515487999}
   - component: {fileID: 1515488001}
   - component: {fileID: 1515488000}
-  m_Layer: 5
+  m_Layer: 15
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15704,7 +15704,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 83f0c6e162a1ad944830b23bf16b9d03, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -15732,7 +15732,7 @@ MonoBehaviour:
   m_fontSize: 36
   m_fontSizeBase: 36
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
@@ -15768,7 +15768,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &1515488001
@@ -16588,7 +16588,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1712197723}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Destination
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16622,7 +16622,7 @@ GameObject:
   - component: {fileID: 1733313714}
   - component: {fileID: 1733313713}
   - component: {fileID: 1733313712}
-  m_Layer: 5
+  m_Layer: 15
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16923,7 +16923,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1758068278}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Destination
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17227,7 +17227,7 @@ GameObject:
   - component: {fileID: 1842830134}
   - component: {fileID: 1842830133}
   - component: {fileID: 1842830132}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Plane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17709,7 +17709,7 @@ GameObject:
   - component: {fileID: 1901696592}
   - component: {fileID: 1901696591}
   - component: {fileID: 1901696590}
-  m_Layer: 5
+  m_Layer: 15
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18148,6 +18148,7 @@ GameObject:
   - component: {fileID: 2029204285}
   - component: {fileID: 2029204284}
   - component: {fileID: 2029204283}
+  - component: {fileID: 2029204287}
   m_Layer: 5
   m_Name: StatDebug
   m_TagString: Untagged
@@ -18237,6 +18238,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &2029204287
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2029204282}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95885efdf9476d64190b648ed2005bce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2064086568
 GameObject:
   m_ObjectHideFlags: 0
@@ -18248,7 +18261,7 @@ GameObject:
   - component: {fileID: 2064086569}
   - component: {fileID: 2064086571}
   - component: {fileID: 2064086570}
-  m_Layer: 5
+  m_Layer: 15
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18296,7 +18309,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 83f0c6e162a1ad944830b23bf16b9d03, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -18324,7 +18337,7 @@ MonoBehaviour:
   m_fontSize: 36
   m_fontSizeBase: 36
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
@@ -18360,7 +18373,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &2064086571
