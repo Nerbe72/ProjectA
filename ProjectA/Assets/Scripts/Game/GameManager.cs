@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
-public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviour, IMoveHandler
 {
     public static GameManager Instance;
     private void Awake()
@@ -22,7 +23,6 @@ public class GameManager : MonoBehaviour
 
         Application.targetFrameRate = 120;
         Cursor.lockState = CursorLockMode.Locked;
-
         SceneManager.sceneLoaded += EscapeBlack;
     }
 
@@ -63,5 +63,10 @@ public class GameManager : MonoBehaviour
         //키 입력 제한 해제
         //키 위치 초기화
         yield break;
+    }
+
+    public void OnMove(AxisEventData eventData)
+    {
+        Debug.Log("Drag");
     }
 }

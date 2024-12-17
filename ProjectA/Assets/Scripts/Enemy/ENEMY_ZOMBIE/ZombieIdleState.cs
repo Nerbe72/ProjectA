@@ -14,6 +14,13 @@ public class ZombieIdleState : IState
 
     public void Update()
     {
+        //피격
+        if (enemy.isHit)
+        {
+            enemy.zombieStateMachine.TransitionTo(enemy.zombieStateMachine.hurtState);
+            return;
+        }
+
         //플레이어를 조우한 경우 따라가기
         if (enemy.IsPlayerInSight())
         {
@@ -21,6 +28,7 @@ public class ZombieIdleState : IState
             return;
         }
 
+        //원위치 복귀
         if (Vector3.Distance(enemy.SpawnPoint, enemy.transform.position) <= 0.1f)
         {
             if (enemy.transform.rotation != enemy.SpawnRotation)

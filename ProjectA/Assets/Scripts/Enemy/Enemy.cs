@@ -15,10 +15,12 @@ public enum EnemyAttack
 
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(Animator))]
+[RequireComponent(typeof(CapsuleCollider))]
 public class Enemy : MonoBehaviour
 {
-    private PlayerController player;
+    protected PlayerController player;
 
+    
     [Tooltip("스폰 위치")] public Vector3 SpawnPoint; //스폰되는 위치. awake시에 설정
     [Tooltip("스폰 회전값")] public Quaternion SpawnRotation; //스폰시 바라보는 방향
 
@@ -28,14 +30,23 @@ public class Enemy : MonoBehaviour
     protected int idFaced = 0;
     protected int idMove = 0;
     protected int idAttack = 0;
+    protected int idHurt = 0;
+    protected int idDead = 0;
 
     protected int currentHp;
-    protected int currentDamage;
     protected int currentDefense;
 
     [SerializeField] protected EnemyData enemyStat;
 
-    public bool IsFaced = false;
+    public bool isFaced = false;
+    public bool isHit = false;
+    public bool isDead = false;
+    protected bool isCutscene = false;
+
+    /// <summary>
+    /// 좀비(only FSM)
+    /// </summary>
+    protected bool isHitting = false;
 
     private void Start()
     {
@@ -46,8 +57,18 @@ public class Enemy : MonoBehaviour
         idFaced = Animator.StringToHash("Faced");
         idMove = Animator.StringToHash("Move");
         idAttack = Animator.StringToHash("Attack");
+        idHurt = Animator.StringToHash("Hurt");
+        idDead = Animator.StringToHash("Dead");
 
+        InitStat();
+        InitForChild();
+    }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other == null) return;
+        if (!other.CompareTag("PlayerAttack")) return;
+        Hit(player.GetDamageGiven());
     }
 
 #if UNITY_EDITOR
@@ -63,14 +84,22 @@ public class Enemy : MonoBehaviour
             Gizmos.color = Color.blue;
             Gizmos.DrawLine(transform.position, transform.position + (player.transform.position - transform.position));
         }
+
+        SpawnPoint = transform.position;
+        SpawnRotation = transform.rotation;
     }
 #endif
 
-    private void InitStat()
+    protected virtual void InitForChild()
+    {
+
+    }
+
+    protected virtual void InitStat()
     {
         currentHp = enemyStat.Hp;
-        //currentDamage = enemyStat.MeleeDamage;
-        //currentDefense = enemyStat.MeleeDefense;
+        Debug.Log($"{name} : {currentHp}");
+        currentDefense = enemyStat.MeleeDefense;
     }
 
     public bool CheckPlayerDistanceIn(float _dist)
@@ -83,6 +112,9 @@ public class Enemy : MonoBehaviour
         return _dist <= Vector3.Distance(SpawnPoint, transform.position);
     }
 
+    /// <summary>
+    /// for zombie fsm
+    /// </summary>
     public bool Chase(float _dist = 0.1f)
     {
         LookPlayer();
@@ -94,7 +126,6 @@ public class Enemy : MonoBehaviour
             return true;
         }
 
-        agent.isStopped = false;
         agent.destination = player.transform.position;
         return false;
     }
@@ -155,30 +186,54 @@ public class Enemy : MonoBehaviour
         animator.SetTrigger(idFaced);
     }
 
+    public void PlayAnimationDead()
+    {
+        try
+        {
+            animator.SetTrigger("DeadT");
+        }
+        catch { }
+        animator.SetBool(idDead, isDead);
+    }
+
+    public void PlayAnimationHurt()
+    {
+        animator.SetTrigger(idHurt);
+    }
+
     public void PlayAnimationWalk()
     {
         animator.SetBool(idMove, agent.desiredVelocity != Vector3.zero);
     }
 
+    //좀비
     public void TriggerAnimationAttack()
     {
         animator.SetTrigger(idAttack);
-        agent.isStopped = true;
+        agent.SetDestination(transform.position);
     }
 
-    public void ResetAttackTrigger()
+    public void ResetAttack()
     {
         animator.ResetTrigger(idAttack);
     }
 
-    //패턴에 따라 다른 데미지 유형 및 공격력
     public virtual void Attack(Collider _other, EnemyAttack _pattern = EnemyAttack.A)
     {
 
     }
 
-    //피격
-    public void Hurt((int melee, int magic) _taken)
+    public void SetDead(bool _isTrue)
+    {
+        isDead = _isTrue;
+    }
+
+    public bool GetHurt()
+    {
+        return isHit;
+    }
+
+    public void Hit((int melee, int magic) _taken)
     {
         //가할 수 있는 최대 데미지: 1000. 단, 방어력이 -가 된 경우 1000 초과 가능
         int takeMelee = (int)Mathf.Floor(_taken.melee * (1 - (enemyStat.MeleeDefense / (1000 + enemyStat.MeleeDefense))));
@@ -189,10 +244,53 @@ public class Enemy : MonoBehaviour
 
         currentHp = nextHp;
 
+        SetHurt();
+
         if (currentHp == 0)
         {
             //dead
-            Debug.Log(name + "<color=red> is DEAD</color>");
+            ResetHurt();
+            SetDead(true);
         }
+    }
+
+    public void Dead()
+    {
+        gameObject.SetActive(false);
+    }
+
+    public void SetHurt()
+    {
+        isHit = true;
+    }
+
+    public void ResetHurt()
+    {
+        isHit = false;
+    }
+
+    public void HoldHurting()
+    {
+        isHitting = true;
+    }
+
+    public void ReleaseHurting()
+    {
+        isHitting = false;
+    }
+
+    public void SetFaced()
+    {
+        isFaced = true;
+    }
+
+    public void SetCutscene()
+    {
+        isCutscene = true;
+    }
+
+    public void ResetCutscene()
+    {
+        isCutscene = false;
     }
 }

@@ -19,9 +19,9 @@ MonoBehaviour:
   sightHeight: {x: 0, y: 1.65, z: 0}
   Hp: 0
   AttackTypes:
-  - MeleeDamage: 80
-    MeleeDefense: 0
+  - MeleeDamage: 120
     MagicDamage: 0
-    MagicDefense: 0
+  MeleeDefense: 50
+  MagicDefense: 10
   StartWithSit: 0
   PatternCount: 2

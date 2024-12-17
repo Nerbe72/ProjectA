@@ -12,6 +12,7 @@ TagManager:
   - Enemy
   - RightHand
   - LeftHand
+  - Wall
   layers:
   - Default
   - TransparentFX
@@ -22,14 +23,14 @@ TagManager:
   - Wall
   - Target
   - Searcher
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Muse Animate Posing
+  - Muse Animate Baking
+  - Muse Animate Handles
+  - Muse Animate Thumbnail
+  - Muse Animate Environment
+  - Attack
+  - FogWall
+  - Enemy
   - 
   - 
   - 

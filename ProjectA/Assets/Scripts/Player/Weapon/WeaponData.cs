@@ -15,7 +15,7 @@ public class WeaponData : ScriptableObject
 {
     // 무기 종류에 따라 시작값을 다르게 설정
     // ex) 1000: 한손검1, 2001:스태프2, 3001:양손검2
-    public int weaponId;
+    public int weaponID;
     public string weaponName;
     public Sprite weaponImage;
     public LazyLoadReference<GameObject> weaponPrefab;

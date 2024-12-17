@@ -18,9 +18,16 @@ public class ZombieAttackState : IState
 
     public void Update()
     {
+        //ÇÇ°Ý
+        if (enemy.isHit)
+        {
+            enemy.zombieStateMachine.TransitionTo(enemy.zombieStateMachine.hurtState);
+            return;
+        }
+
         if (enemy.IsAnimationAttack())
         {
-            enemy.ResetAttackTrigger();
+            enemy.ResetAttack();
             return;
         }
 

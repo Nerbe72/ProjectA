@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
@@ -47,6 +48,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float RunMultiply;
     [SerializeField] private float DodgeSpeed;
 
+    private bool refuseAllInput = false;
 
     WaitForSeconds dodgeWorkTime = new WaitForSeconds(0.15f);
     WaitForSeconds hurtWait = new WaitForSeconds(1f);
@@ -83,13 +85,12 @@ public class PlayerController : MonoBehaviour
         targetManager = TargetManager.Instance;
         keyManager = KeyManager.Instance;
         cameraManager = CameraManager.Instance;
-
-        playerWeapon.EquipWeapon(Hand.Right, WeaponManager.Instance.GetWeaponFromId(1000));
-        playerWeapon.EquipWeapon(Hand.Right, WeaponManager.Instance.GetWeaponFromId(2000));
     }
 
     private void Update()
     {
+        if (refuseAllInput) return;
+
         ReadInputDodge();
         ReadInputAttack();
     }
@@ -97,6 +98,9 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         CheckGround();
+
+        if (refuseAllInput) return;
+
         Rotation();
         Move();
         Dodge();
@@ -178,7 +182,7 @@ public class PlayerController : MonoBehaviour
     private void ReadInputAttack()
     {
         if (Dodging || Dying) return;
-        playerAnimation.PlayAnimationAttack(playerInput.IsAttack);
+        playerAnimation.PlayAnimationAttack(playerStat.currentWeapon, playerInput.IsAttack);
     }
 
     private void Dodge()
@@ -195,12 +199,21 @@ public class PlayerController : MonoBehaviour
     }
 
     //적에 의해 호출
-    public void Hurt(EnemyAttackType _data)
+    public void Hurt(EnemyData _data, EnemyAttack _type)
     {
         if (blockHurt || Dying) return;
         if (c_dodgeHolder != null) return;
 
-        int result = Math.Clamp(playerStat.currentHealth - (_data.MeleeDamage), 0, playerStat.GetStat().Health);
+        EnemyAttackType currentType = _data.AttackTypes[(int)_type];
+
+        //가할 수 있는 최대 데미지: 1000. 단, 방어력이 -가 된 경우 1000 초과 가능
+        int takeMelee = (int)Mathf.Floor(currentType.MeleeDamage * (1 - (playerStat.currentMeleeDefense / (playerStat.GetStat().Health + playerStat.currentMeleeDefense))));
+        //가할 수 있는 최대 데미지: 1100. 단, 마법방어력이 -가 된 경우 1100 초과 가능
+        int takeMagic = (int)Mathf.Floor(currentType.MagicDamage * (1 - (playerStat.currentMagicDefense / (playerStat.GetStat().Health + playerStat.currentMagicDefense))));
+
+        int totalTaken = takeMelee + takeMagic;
+
+        int result = Math.Clamp(playerStat.currentHealth - (totalTaken), 0, playerStat.GetStat().Health);
 
         playerAnimation.PlayHurt();
 
@@ -212,21 +225,46 @@ public class PlayerController : MonoBehaviour
         playerStat.SetHealth(result);
     }
 
+    public (int melee, int magic) GetDamageGiven()
+    {
+        (int melee, int magic) damageGiven = (0, 0);
+
+        if (playerStat.currentWeapon == null)
+            return (playerStat.currentMeleeDamage, 0);
+
+        switch (playerStat.currentWeapon.weaponType)
+        {
+            case WeaponType.MeleeOneHand:
+                damageGiven = (playerStat.currentMeleeDamage + playerStat.currentWeapon.meleeDamage, playerStat.currentWeapon.magicDamage);
+                break;
+            case WeaponType.Magic:
+                damageGiven = (0, playerStat.currentWeapon.magicDamage + playerStat.currentMagic.MagicDamage);
+                break;
+        }
+
+        return damageGiven;
+    }
+
+    public void SetRefuseInput()
+    {
+        refuseAllInput = true;
+    }
+
+    public void UnSetRefuseInput()
+    {
+        refuseAllInput = false;
+    }
+
     private void Dead()
     {
         playerAnimation.PlayDead();
     }
-
-    private void Respawn()
-    {
-        transform.position = new Vector3(-20.28f, 0, 1.84f);
-
-        playerAnimation.StopDead();
-        playerStat.ResetHealth();
-        respawn = false;
-        ReleaseDead();
-    }
     #endregion
+
+    public void ResetRotation(Quaternion _rotate)
+    {
+        transform.rotation = _rotate;
+    }
 
     #region AnimationEvents
     public void HoldDodging()
@@ -272,12 +310,12 @@ public class PlayerController : MonoBehaviour
 
     public void HoldAttackCollider()
     {
-        playerWeapon.Attack(playerStat.currentWeapon.weaponId, true);
+        playerWeapon.Attack(playerStat.currentWeapon.weaponID, true);
     }
 
     public void ReleaseAttackCollider()
     {
-        playerWeapon.Attack(playerStat.currentWeapon.weaponId, false);
+        playerWeapon.Attack(playerStat.currentWeapon.weaponID, false);
     }
 
     public void HoldDead()
@@ -288,6 +326,26 @@ public class PlayerController : MonoBehaviour
     public void ReleaseDead()
     {
         Dying = false;
+    }
+
+    public void Respawn()
+    {
+        transform.position = new Vector3(-20.28f, 0, 1.84f);
+
+        playerAnimation.StopDead();
+        playerStat.ResetHealth();
+        //스폰할 맵과 위치에 맞춰 조정
+        respawn = false;
+    }
+
+    public void Fire()
+    {
+        playerWeapon.Attack(playerStat.currentWeapon.weaponID, true);
+    }
+
+    public void Swap()
+    {
+        
     }
     #endregion
 }

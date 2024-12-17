@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 963848910788701484}
   - component: {fileID: 6370192134433039771}
   - component: {fileID: 1830763672287588887}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: LongSword
   m_TagString: PlayerAttack
   m_Icon: {fileID: 0}
@@ -95,9 +95,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 087b782d3a5a00e4483275f5c7c05413, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Id: 0
-  MeleeDamage: 0
-  MagicDamage: 0
 --- !u!1 &4334314813405729788
 GameObject:
   m_ObjectHideFlags: 0
@@ -109,7 +106,7 @@ GameObject:
   - component: {fileID: 4334314813405729787}
   - component: {fileID: 4334314813405729783}
   - component: {fileID: 4334314813405729784}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: LongSwordMesh
   m_TagString: PlayerAttack
   m_Icon: {fileID: 0}
