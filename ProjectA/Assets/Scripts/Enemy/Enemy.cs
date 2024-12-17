@@ -34,20 +34,19 @@ public class Enemy : MonoBehaviour
     protected int idDead = 0;
 
     protected int currentHp;
-    protected int currentDamage;
     protected int currentDefense;
 
     [SerializeField] protected EnemyData enemyStat;
 
     public bool isFaced = false;
-    public bool isHurt = false;
+    public bool isHit = false;
     public bool isDead = false;
     protected bool isCutscene = false;
 
     /// <summary>
     /// 좀비(only FSM)
     /// </summary>
-    protected bool isHurting = false;
+    protected bool isHitting = false;
 
     private void Start()
     {
@@ -60,6 +59,8 @@ public class Enemy : MonoBehaviour
         idAttack = Animator.StringToHash("Attack");
         idHurt = Animator.StringToHash("Hurt");
         idDead = Animator.StringToHash("Dead");
+
+        InitStat();
         InitForChild();
     }
 
@@ -67,8 +68,7 @@ public class Enemy : MonoBehaviour
     {
         if (other == null) return;
         if (!other.CompareTag("PlayerAttack")) return;
-
-        Hurt(player.GetDamageGiven());
+        Hit(player.GetDamageGiven());
     }
 
 #if UNITY_EDITOR
@@ -95,11 +95,11 @@ public class Enemy : MonoBehaviour
 
     }
 
-    private void InitStat()
+    protected virtual void InitStat()
     {
         currentHp = enemyStat.Hp;
-        //currentDamage = enemyStat.MeleeDamage;
-        //currentDefense = enemyStat.MeleeDefense;
+        Debug.Log($"{name} : {currentHp}");
+        currentDefense = enemyStat.MeleeDefense;
     }
 
     public bool CheckPlayerDistanceIn(float _dist)
@@ -188,7 +188,11 @@ public class Enemy : MonoBehaviour
 
     public void PlayAnimationDead()
     {
-        animator.SetTrigger("DeadT");
+        try
+        {
+            animator.SetTrigger("DeadT");
+        }
+        catch { }
         animator.SetBool(idDead, isDead);
     }
 
@@ -202,10 +206,11 @@ public class Enemy : MonoBehaviour
         animator.SetBool(idMove, agent.desiredVelocity != Vector3.zero);
     }
 
+    //좀비
     public void TriggerAnimationAttack()
     {
         animator.SetTrigger(idAttack);
-        agent.isStopped = true;
+        agent.SetDestination(transform.position);
     }
 
     public void ResetAttack()
@@ -225,13 +230,11 @@ public class Enemy : MonoBehaviour
 
     public bool GetHurt()
     {
-        return isHurt;
+        return isHit;
     }
 
-    //피격
-    public void Hurt((int melee, int magic) _taken)
+    public void Hit((int melee, int magic) _taken)
     {
-        Debug.Log("Hurt");
         //가할 수 있는 최대 데미지: 1000. 단, 방어력이 -가 된 경우 1000 초과 가능
         int takeMelee = (int)Mathf.Floor(_taken.melee * (1 - (enemyStat.MeleeDefense / (1000 + enemyStat.MeleeDefense))));
         //가할 수 있는 최대 데미지: 1100. 단, 마법방어력이 -가 된 경우 1100 초과 가능
@@ -258,22 +261,22 @@ public class Enemy : MonoBehaviour
 
     public void SetHurt()
     {
-        isHurt = true;
+        isHit = true;
     }
 
     public void ResetHurt()
     {
-        isHurt = false;
+        isHit = false;
     }
 
     public void HoldHurting()
     {
-        isHurting = true;
+        isHitting = true;
     }
 
     public void ReleaseHurting()
     {
-        isHurting = false;
+        isHitting = false;
     }
 
     public void SetFaced()

@@ -29,7 +29,7 @@ public class ZombieMoveState : IState
         }
 
         //ÇÇ°Ý
-        if (enemy.isHurt)
+        if (enemy.isHit)
         {
             enemy.zombieStateMachine.TransitionTo(enemy.zombieStateMachine.hurtState);
             return;

@@ -15,7 +15,7 @@ public class ZombieIdleState : IState
     public void Update()
     {
         //ÇÇ°Ý
-        if (enemy.isHurt)
+        if (enemy.isHit)
         {
             enemy.zombieStateMachine.TransitionTo(enemy.zombieStateMachine.hurtState);
             return;

@@ -7256,7 +7256,7 @@ Camera:
     height: 1
   near clip plane: 0.1
   far clip plane: 5000
-  field of view: 20
+  field of view: 40
   orthographic: 0
   orthographic size: 10
   m_Depth: -1
@@ -7282,8 +7282,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 340600171}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 18.75, y: 1.7149999, z: 1.1399999}
+  m_LocalRotation: {x: -0.17328537, y: 0.046065502, z: -0.0072137695, w: -0.9837674}
+  m_LocalPosition: {x: 18.135994, y: 5.8465366, z: 160.46584}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -16904,7 +16904,7 @@ CapsuleCollider:
     m_Bits: 16384
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 2147499904
+    m_Bits: 2147516800
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0
@@ -17368,10 +17368,10 @@ MonoBehaviour:
   Attacking: 0
   Dodging: 0
   Dying: 0
-  dodgeEndTime: 0.45
-  MoveSpeed: 2
-  RunMultiply: 4
-  DodgeSpeed: 13
+  dodgeEndTime: 0.1
+  MoveSpeed: 2.2
+  RunMultiply: 3
+  DodgeSpeed: 4
 --- !u!143 &1846661294
 CharacterController:
   m_ObjectHideFlags: 0

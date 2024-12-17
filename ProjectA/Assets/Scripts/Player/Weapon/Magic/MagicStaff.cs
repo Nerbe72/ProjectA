@@ -32,8 +32,7 @@ public class MagicStaff : MonoBehaviour, IWeapon
         //ÅºÈ¯ ¹ß»ç
         GameObject bullet = Instantiate(PlayerStat.Instance.currentMagic.bulletStyle.asset);
         bullet.GetComponent<MagicBullet>().SetTrace(TargetManager.Instance.CurrentTarget, _force:60);
-        bullet.GetComponent<MagicBullet>().SetData(BulletOutFrom.position, cameraManager.main.transform.rotation, _speed:2);
-        Debug.Log("Attack");
+        bullet.GetComponent<MagicBullet>().SetData(BulletOutFrom.position, cameraManager.main.transform.rotation, _speed:3);
     }
 
     public void OnHand()

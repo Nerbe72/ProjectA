@@ -12,6 +12,7 @@ TagManager:
   - Enemy
   - RightHand
   - LeftHand
+  - Wall
   layers:
   - Default
   - TransparentFX
@@ -29,7 +30,7 @@ TagManager:
   - Muse Animate Environment
   - Attack
   - FogWall
-  - 
+  - Enemy
   - 
   - 
   - 

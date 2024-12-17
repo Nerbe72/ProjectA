@@ -18,7 +18,7 @@ public class ZombieHurtState : IState
 
     public void Update()
     {
-        if (enemy.isHurt) return;
+        if (enemy.isHit) return;
 
         //»ç¸Á
         if (enemy.isDead)

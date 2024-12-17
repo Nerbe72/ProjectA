@@ -5,12 +5,17 @@ public class NormalMagic : MagicBullet
     private void OnTriggerEnter(Collider other)
     {
         if (other == null) return;
-        if (other.CompareTag("Ground") || other.CompareTag("Wall")) BreakObject();
+        if (other.CompareTag("Ground") || other.CompareTag("Wall"))
+        {
+            BreakObject();
+            return;
+        }
         if (!other.CompareTag("Enemy")) return;
         if (other.GetComponent<Enemy>() == null) return;
 
         //대상에게 데미지/ (물리, 마법) 데미지를 입힘
-        other.GetComponent<Enemy>().Hurt((0, 0));
+        other.GetComponent<Enemy>().Hit(PlayerController.Instance.GetDamageGiven());
+        BreakObject();
     }
 
     protected override void TracingPath()

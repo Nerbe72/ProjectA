@@ -12,14 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7c9ee6b35577204f8319d813ea7e226, type: 3}
   m_Name: BOSS_SCAVENGER
   m_EditorClassIdentifier: 
-  Name: 
+  Name: Scavenger
   IsBoss: 1
   sightAngle: 0
   sightDistance: 0
   sightHeight: {x: 0, y: 0, z: 0}
   Hp: 2300
-  AttackTypes: []
-  MeleeDefense: 0
-  MagicDefense: 0
+  AttackTypes:
+  - MeleeDamage: 180
+    MagicDamage: 0
+  MeleeDefense: 10
+  MagicDefense: 10
   StartWithSit: 0
   PatternCount: 0
