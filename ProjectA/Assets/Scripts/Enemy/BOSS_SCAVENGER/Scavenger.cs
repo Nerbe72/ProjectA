@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.VisualScripting;
@@ -19,6 +20,16 @@ public enum ScavengerPattern
     Retreat,
     Backward,
     Attack,
+}
+
+public static class ScavengerHash
+{
+    public static readonly int Walk = Animator.StringToHash("Walk");
+    public static readonly int Side = Animator.StringToHash("Side");
+    public static readonly int AttackType = Animator.StringToHash("AttackType");
+    public static readonly int Attack = Animator.StringToHash("Attack");
+    public static readonly int Hurt = Animator.StringToHash("Hurt");
+    public static readonly int DeadB = Animator.StringToHash("Dead");
 }
 
 public class Scavenger : Enemy
@@ -57,6 +68,7 @@ public class Scavenger : Enemy
     [SerializeField][Tooltip("회피 동작 속도 (8.0)")] private float evadeSpeed;
 
     [Header("보스 체력바")]
+    [SerializeField] private Canvas bossUICanvas;
     [SerializeField] private TMP_Text bossName;
     [SerializeField] private Slider bossHealthSlider;
     [Header("Debug")]
@@ -65,15 +77,8 @@ public class Scavenger : Enemy
     private bool CanAttack => (Time.time - lastAttackTime) >= attackInterval;
     private bool CanChangePattern => (Time.time - lastPatternChangeTime) >= patternCooldownTime;
 
-    public static class ScavengerHash
-    {
-        public static readonly int Walk = Animator.StringToHash("Walk");
-        public static readonly int Side = Animator.StringToHash("Side");
-        public static readonly int AttackType = Animator.StringToHash("AttackType");
-        public static readonly int Attack = Animator.StringToHash("Attack");
-        public static readonly int Hurt = Animator.StringToHash("Hurt");
-        public static readonly int DeadB = Animator.StringToHash("Dead");
-    }
+    private Coroutine healthCo;
+    private float healthTemp = 0f;
 
     private void Update()
     {
@@ -91,24 +96,30 @@ public class Scavenger : Enemy
 
         //컷씬 대기
         if (!isCutscene)
+        {
             rootNode.Evaluate();
+            if (!bossUICanvas.gameObject.activeSelf)
+                bossUICanvas.gameObject.SetActive(true);
+        }
 
         Vector3 localVelocity = transform.InverseTransformDirection(agent.velocity);
-        animator.SetFloat(ScavengerHash.Side, Mathf.Lerp(animator.GetFloat(ScavengerHash.Side), localVelocity.x, Time.deltaTime * 3f));
         animator.SetFloat(ScavengerHash.Walk, Mathf.Lerp(animator.GetFloat(ScavengerHash.Walk), localVelocity.z, Time.deltaTime * 3f));
+        animator.SetFloat(ScavengerHash.Side, Mathf.Lerp(animator.GetFloat(ScavengerHash.Side), localVelocity.x, Time.deltaTime * 3f));
+        Debug.Log($"{animator.GetFloat(ScavengerHash.Walk)} , {animator.GetFloat(ScavengerHash.Side)}");
     }
 
     protected override void InitStat()
     {
         base.InitStat();
-        //체력바 표시
+        bossHealthSlider.maxValue = currentHp;
+        bossHealthSlider.value = currentHp;
+        bossName.text = enemyStat.Name;
     }
 
     protected override void InitForChild()
     {
         agent.acceleration = float.MaxValue;
         agent.stoppingDistance = 1.5f;
-        //InitBT();
         rootNode = CreateBT();
     }
 
@@ -123,8 +134,8 @@ public class Scavenger : Enemy
             }),
             new Sequence(new List<Node>
             {
-                new ActionNode(CheckIsNotAttacking),
                 new ActionNode(CheckIsHit),
+                new ActionNode(CheckIsNotAttacking),
                 new ActionNode(PerformHit)
             }),
             new Sequence(new List<Node>
@@ -168,7 +179,11 @@ public class Scavenger : Enemy
     {
         if (isHit)
         {
-            Debug.Log("AA");
+            //피격 진입 초기화
+            ResetHurt();
+            if (healthCo != null)
+                StopCoroutine(healthCo);
+            healthCo = StartCoroutine(HpBarLerp());
             return NodeStates.SUCCESS;
         }
         return NodeStates.FAILURE;
@@ -185,18 +200,15 @@ public class Scavenger : Enemy
 
     private NodeStates PerformHit()
     {
-        //체력바 감소
+        isHitting = true;
 
-        //피격 진입 초기화
-        ResetHurt();
-        //거리에 따른 조절
         if (DistanceToPlayer() <= 2.5f)
         {
-            // 플레이어와의 거리가 2.5 이내인 경우 후퇴
+            // 플레이어와의 거리가 2.5 이내인 경우 후퇴 및 애니메이션 재생
             agent.updateRotation = false;
             Vector3 targetDir = transform.position - player.transform.position;
-            agent.speed = retreatSpeed;
-            agent.SetDestination(transform.position + targetDir.normalized * 2f); // 0.5만큼 짧은 거리 후퇴
+            agent.speed = evadeSpeed;
+            agent.SetDestination(transform.position + targetDir.normalized * 4f); // 2.5만큼 짧은 거리 후퇴
             transform.rotation = Quaternion.LookRotation(-targetDir); // 플레이어를 바라본 채 후퇴
             animator.SetTrigger(ScavengerHash.Hurt);
             text.text = "<color=yellow>Hit Retreat</color>";
@@ -206,6 +218,7 @@ public class Scavenger : Enemy
         {
             // 플레이어와의 거리가 2.5 이상인 경우 애니메이션만 재생
             animator.SetTrigger(ScavengerHash.Hurt);
+            agent.SetDestination(transform.position);
             text.text = "<color=yellow>Hit Animation</color>";
             return NodeStates.SUCCESS;
         }
@@ -223,6 +236,8 @@ public class Scavenger : Enemy
     private NodeStates DoDead()
     {
         PlayAnimationDead();
+        if (bossUICanvas.gameObject.activeSelf)
+            bossUICanvas.gameObject.SetActive(false);
         return NodeStates.RUNNING;
     }
 
@@ -249,7 +264,6 @@ public class Scavenger : Enemy
             animator.SetTrigger(ScavengerHash.Attack);
             
             text.text = "<color=red>Perform Melee Attack</color>";
-            // 공격이 끝난 후 타이머를 다시 증가시키기 위해 false로 설정합니다.
             return NodeStates.RUNNING;
         }
         return NodeStates.FAILURE;
@@ -263,14 +277,12 @@ public class Scavenger : Enemy
             float distance = DistanceToPlayer();
             float speed = CalculateRangedAttackSpeed(distance);
             agent.speed = speed;
-            agent.stoppingDistance = 1.5f; // 플레이어와 겹치지 않게 설정
             Vector3 targetPosition = player.transform.position;
             agent.SetDestination(targetPosition);
             animator.SetInteger(ScavengerHash.AttackType, (int)ScavengerAttackType.B);
             animator.SetTrigger(ScavengerHash.Attack);
             
             text.text = "<color=red>Perform Ranged Attack</color>";
-            // 공격이 끝난 후 타이머를 다시 증가시키기 위해 false로 설정합니다.
             return NodeStates.RUNNING;
         }
         return NodeStates.FAILURE;
@@ -404,5 +416,30 @@ public class Scavenger : Enemy
             default:
                 break;
         }
+    }
+
+    public void FlagDeath()
+    {
+        //오브젝트 제거 및 사망처리
+    }
+
+    private IEnumerator HpBarLerp()
+    {
+        float time = 0;
+        float temp = bossHealthSlider.value;
+
+        while (true)
+        {
+            time += Time.deltaTime * 9f;
+
+            bossHealthSlider.value = Mathf.Lerp(temp, currentHp, time);
+
+            if (time >= 1f) break;
+
+            yield return new WaitForEndOfFrame();
+        }
+
+        healthCo = null;
+        yield break;
     }
 }
