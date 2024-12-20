@@ -15,6 +15,7 @@ public struct Stat
     public MagicData Magic;
     public int WeaponID;
     public int MagicID;
+
+    public string MapName;
+    public Vector3 SpawnPoint;
 }
-
-

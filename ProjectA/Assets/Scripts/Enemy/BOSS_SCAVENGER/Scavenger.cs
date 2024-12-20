@@ -39,7 +39,6 @@ public class Scavenger : Enemy
 
     private bool isChase = false;
     private bool isAttack = false;
-    private bool isRetreating = false;
     private bool isMovingRight = true;
     private bool isEvading = false;
 
@@ -105,11 +104,17 @@ public class Scavenger : Enemy
         Vector3 localVelocity = transform.InverseTransformDirection(agent.velocity);
         animator.SetFloat(ScavengerHash.Walk, Mathf.Lerp(animator.GetFloat(ScavengerHash.Walk), localVelocity.z, Time.deltaTime * 3f));
         animator.SetFloat(ScavengerHash.Side, Mathf.Lerp(animator.GetFloat(ScavengerHash.Side), localVelocity.x, Time.deltaTime * 3f));
-        Debug.Log($"{animator.GetFloat(ScavengerHash.Walk)} , {animator.GetFloat(ScavengerHash.Side)}");
     }
 
     protected override void InitStat()
     {
+        BossState state = SaveManager.Instance.GetBossState(enemyStat.ID);
+        if (state != null && state.IsDeath)
+        {
+            Debug.Log("Destroy boss");
+            Destroy(gameObject);
+            return;
+        }
         base.InitStat();
         bossHealthSlider.maxValue = currentHp;
         bossHealthSlider.value = currentHp;
@@ -368,16 +373,6 @@ public class Scavenger : Enemy
         isAttack = false;
     }
 
-    public void SetRetreating()
-    {
-        isRetreating = true;
-    }
-
-    public void ResetRetreating()
-    {
-        isRetreating = false;
-    }
-
     public void Stop()
     {
         agent.velocity = Vector3.zero;
@@ -418,10 +413,16 @@ public class Scavenger : Enemy
         }
     }
 
+    public void DestroyDeath()
+    {
+        FlagDeath();
+        Destroy(gameObject, 0.5f);
+    }
+
     public void FlagDeath()
     {
-        //¿ÀºêÁ§Æ® Á¦°Å ¹× »ç¸ÁÃ³¸® todo
-        SaveManager.Instance.SaveBossStateData();
+        SaveManager.Instance.SetBossState(enemyStat.ID, true);
+        //ÈÄ¼Ó ÄÆ¾À?
     }
 
     private IEnumerator HpBarLerp()

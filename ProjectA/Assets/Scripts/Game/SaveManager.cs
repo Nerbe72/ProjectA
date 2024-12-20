@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using Unity.Serialization.Json;
 using UnityEngine;
 
 public class SaveManager : MonoBehaviour
@@ -8,9 +10,15 @@ public class SaveManager : MonoBehaviour
     public static SaveManager Instance;
 
     //항상 increased가 더해진 값을 스탯으로 가짐
-    private Stat currentStat;
-    private Stat currentStatIncreased;
+    private Stat currentStat = new Stat();
+    private Stat currentStatIncreased = new Stat();
     private int currentSaveSlot;
+
+    private List<BossState> bossStates;
+
+    private string defaultDataPath;
+    private string bossPath;
+    private string playerPath;
 
     private void Awake()
     {
@@ -26,50 +34,73 @@ public class SaveManager : MonoBehaviour
             return;
         }
 
-        if (!LoadStatData())
+        defaultDataPath = Path.Combine(Application.persistentDataPath, "Datas");
+        bossPath = Path.Combine(defaultDataPath, "BOSS_STATES.json");
+        playerPath = Path.Combine(defaultDataPath, "PLAYER_STAT.json");
+
+        if (!Directory.Exists(defaultDataPath))
         {
-            //재생성
-            currentStat = new Stat();
-
-            currentStat.Health = 800;
-            currentStat.MeleeDamage = 100;
-            currentStat.MeleeDefense = 50;
-            currentStat.MagicDefense = 50;
-            currentStat.Souls = 0;
-            currentStat.WeaponID = 1000;
-            currentStat.MagicID = 10000;
-
-            string jsonData = JsonUtility.ToJson(currentStat);
-            string path = Path.Combine(Application.dataPath + "/Resources/Datas/PlayerStats.json");
-            File.WriteAllText(path, jsonData);
+            Directory.CreateDirectory(defaultDataPath);
         }
+
+        currentStat = LoadPlayerStat();
+        SavePlayerStat();
+        bossStates = LoadBossStateData();
+        SaveBossStateData();
     }
 
-    //호출 성공 여부 반환
-    public bool LoadStatData()
+    public Stat LoadPlayerStat()
     {
-        currentStat = new Stat();
+        Stat tempStat = new Stat();
 
-        try
+        if (!File.Exists(playerPath))
         {
-            string dataPath = "Datas/PlayerStats";
-            var dataJson = Resources.Load<TextAsset>(dataPath);
-            currentStat = JsonUtility.FromJson<Stat>(dataJson.text);
-
-            currentStat.Weapon = WeaponManager.Instance.GetWeaponFromId(currentStat.WeaponID);
-            currentStat.Magic = WeaponManager.Instance.GetMagicFromId(currentStat.MagicID);
-
-            return true;
+            tempStat.Health = 800;
+            tempStat.MeleeDamage = 100;
+            tempStat.MeleeDefense = 50;
+            tempStat.MagicDefense = 50;
+            tempStat.Souls = 0;
+            tempStat.WeaponID = 1000;
+            tempStat.MagicID = 10000;
+            tempStat.MapName = "Stage1";
+            tempStat.SpawnPoint = new Vector3(18.6f, 0, 7.14f);
         }
-        catch { return false; }
+        else
+        {
+            string json = File.ReadAllText(playerPath);
+            tempStat = JsonUtility.FromJson<Stat>(json);
+        }
+        tempStat.Weapon = WeaponManager.Instance.GetWeaponFromId(tempStat.WeaponID);
+        tempStat.Magic = WeaponManager.Instance.GetMagicFromId(tempStat.MagicID);
+
+        return tempStat;
     }
 
-    private void InitStatData()
+    public void SavePlayerStat()
     {
+        if (!File.Exists(playerPath))
+            File.Create(playerPath).Close();
 
+        string json = JsonUtility.ToJson(currentStat, true);
+        File.WriteAllText(playerPath, json);
     }
 
-    public Stat GetRegularStat()
+    /// <summary>
+    /// 세이브 파일을 삭제하고 다시 로드함
+    /// </summary>
+    public void ResetAllData()
+    {
+        if (File.Exists(playerPath))
+            File.Delete(playerPath);
+
+        if (File.Exists(bossPath))
+            File.Delete(bossPath);
+
+        LoadPlayerStat();
+        LoadBossStateData();
+    }
+
+    public Stat GetPlayerStat()
     {
         //return from loaded data
         return currentStat;
@@ -80,28 +111,88 @@ public class SaveManager : MonoBehaviour
         return currentStatIncreased;
     }
 
-    public void SaveStatData()
+    public void NewGame_ResetAllFiles()
     {
+        File.Delete(playerPath);
+        File.Delete(bossPath);
 
+        LoadPlayerStat();
+        LoadBossStateData();
     }
 
-    public void LoadDisplayData()
+    public List<BossState> LoadBossStateData()
     {
+        //전체 보스 정보 불러오기
+        if (!File.Exists(bossPath))
+            return new List<BossState>();
+        else
+        {
+            string json = File.ReadAllText(bossPath);
 
-    }
-
-    public void SaveDisplayData()
-    {
-
-    }
-
-    public void LoadBossStateData()
-    {
-        //보스 사망 여부
+            List<BossState> wrap = JsonUtility.FromJson<List<BossState>>(json);
+            return wrap;
+        }
     }
 
     public void SaveBossStateData()
     {
+        //보스 정보 내보내기
+        if (!File.Exists(bossPath))
+            File.Create(bossPath).Close();
 
+        string json = JsonUtility.ToJson(new BossStateWrapper(bossStates), true);
+        File.WriteAllText(bossPath, json);
     }
+
+    /// <summary>
+    /// 본인(ID)에 해당하는 사망정보 반환
+    /// </summary>
+    /// <param name="_id">보스 id</param>
+    /// <returns></returns>
+    public BossState GetBossState(int _id)
+    {
+        BossState current = new BossState(_id, false);
+
+        if (bossStates == null) return current;
+
+        foreach (var bs in bossStates)
+        {
+            if (bs.ID == _id) current = bs;
+        }
+
+        return current;
+    }
+
+    public void SetBossState(int _id, bool _isDeath = false)
+    {
+        int count = bossStates.Count;
+        bool isContains = false;
+        for (int i = 0; i < count; i++)
+        {
+            if (bossStates[i].ID == _id)
+            {
+                bossStates[i].IsDeath = _isDeath;
+                Debug.Log(bossStates[i].IsDeath);
+                isContains = true;
+                break;
+            }
+        }
+        if (!isContains)
+            bossStates.Add(new BossState(_id, _isDeath));
+
+        SaveBossStateData();
+    }
+
+
+    [Serializable]
+    public class BossStateWrapper
+    {
+        public List<BossState> BOSS_STATES;
+
+        public BossStateWrapper(List<BossState> _states)
+        {
+            BOSS_STATES = _states;
+        }
+    }
+
 }

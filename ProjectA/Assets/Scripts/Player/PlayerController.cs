@@ -23,6 +23,7 @@ public class PlayerController : MonoBehaviour
     private CharacterController characterController;
 
     [SerializeField] private GameObject followThis;
+    public GameObject resetPosition;
     #endregion
 
     #region 변수
@@ -62,6 +63,7 @@ public class PlayerController : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            GameManager.dontDestroyObjects.Add(gameObject);
         } else
         {
             Destroy(gameObject);

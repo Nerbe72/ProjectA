@@ -28,7 +28,7 @@ public class FogWall : Interact
         playerCC.enabled = false;
         player.transform.position = destination.position;
         PlayerController.Instance.ResetRotation(destination.rotation);
-        Debug.Log($"player {player.transform.rotation} / dest {destination.rotation}");
+        //Debug.Log($"player {player.transform.rotation} / dest {destination.rotation}");
         playerCC.enabled = true;
 
         playerCC.velocity.Set(0, 0, 0);

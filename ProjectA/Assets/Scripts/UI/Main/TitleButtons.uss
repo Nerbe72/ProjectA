@@ -1,0 +1,27 @@
+.title-button {
+    font-size: 280%;
+    color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+    background-color: rgba(188, 188, 188, 0);
+    border-left-color: rgba(255, 255, 255, 0);
+    border-right-color: rgba(255, 255, 255, 0);
+    border-top-color: rgba(255, 255, 255, 0);
+    border-bottom-color: rgba(255, 255, 255, 0);
+    -unity-background-image-tint-color: rgba(255, 255, 255, 0);
+    transition-timing-function: ease-out;
+    transition-duration: 1s;
+}
+
+.title-button:hover {
+    font-size: 280%;
+    color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+    background-color: rgba(188, 188, 188, 0);
+    border-left-color: rgba(255, 255, 255, 0);
+    border-right-color: rgba(255, 255, 255, 0);
+    border-top-color: rgba(255, 255, 255, 0);
+    border-bottom-color: rgba(255, 255, 255, 0);
+    -unity-background-image-tint-color: rgba(255, 255, 255, 0);
+    transition-duration: 1s;
+    scale: 1.1 1.1;
+}

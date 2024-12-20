@@ -56,7 +56,7 @@ public class PlayerWeapon : MonoBehaviour
             }
         }
 
-        EquipMagic(SaveManager.Instance.GetRegularStat().Magic);
+        EquipMagic(SaveManager.Instance.GetPlayerStat().Magic);
     }
 
     public void EquipWeapon(Hand _hand, WeaponData _weapon)
@@ -79,6 +79,7 @@ public class PlayerWeapon : MonoBehaviour
 
     public void EquipMagic(MagicData _magic)
     {
+        if (_magic == null) return;
         if (_magic.bulletStyle.asset == null) return;
 
         PlayerStat.Instance.currentMagic = _magic;

@@ -28,6 +28,7 @@ public class WeaponManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            GameManager.dontDestroyObjects.Add(gameObject);
         } else
         {
             Destroy(gameObject);

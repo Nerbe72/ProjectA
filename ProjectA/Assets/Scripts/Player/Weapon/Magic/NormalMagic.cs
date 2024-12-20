@@ -23,7 +23,7 @@ public class NormalMagic : MagicBullet
         if (traceTarget == null) return;
 
         //타겟에 근접하거나 지나친 경우 추적 해제
-        if (Vector3.Distance(transform.position, traceTarget.position) <= 0.5f)
+        if (Vector3.Distance(transform.position, traceTarget.position) <= 0.1f)
             SetTrace(null);
 
         Vector3 directionTo = (traceTarget.transform.position - transform.position).normalized;

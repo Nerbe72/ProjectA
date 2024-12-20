@@ -26,6 +26,7 @@ public class CameraManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            GameManager.dontDestroyObjects.Add(gameObject);
         }
         else
         {
@@ -66,8 +67,7 @@ public class CameraManager : MonoBehaviour
         return new Vector3(0, main.transform.eulerAngles.y, 0);
     }
 
-
-    /// <param name="_setTarget">타깃을 설정하는 경우 true, 타깃을 제거하는 경우 false</param>
+    //타겟 상태에 따른 카메라 설정
     public void SetFollow(CameraType _type, Target _target = null)
     {
         if (_type == CameraType.Target && _target == null) return;
@@ -84,6 +84,19 @@ public class CameraManager : MonoBehaviour
         //변경사항 없음
         if (vCams[_followType].activeSelf)
             return;
+
+        if (_followType == 0)
+        {
+            CinemachinePOV pov = vCams[0].GetComponent<CinemachineVirtualCamera>().GetCinemachineComponent<CinemachinePOV>();
+            Transform composerT = vCams[1].transform;
+            Vector3 composerForward = composerT.forward;
+
+            Transform povT = vCams[0].transform;
+            povT.rotation = Quaternion.LookRotation(composerForward);
+
+            pov.m_HorizontalAxis.Value = povT.eulerAngles.y;
+            pov.m_VerticalAxis.Value = povT.eulerAngles.x;
+        }
 
         for (int i = 0; i < vCams.Count; i++)
         {

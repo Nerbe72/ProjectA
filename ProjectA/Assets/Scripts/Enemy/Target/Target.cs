@@ -14,17 +14,20 @@ public class Target : MonoBehaviour
 
     [SerializeField] private GameObject indicator;
 
+    Camera cam;
+
     private bool isInSight = false;
 
     private void Start()
     {
         targetManager = TargetManager.Instance;
         player = PlayerController.Instance;
+        cam = CameraManager.Instance.main;
     }
 
     private void Update()
     {
-        transform.LookAt(Camera.main.transform);
+        transform.LookAt(cam.transform);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -51,6 +54,7 @@ public class Target : MonoBehaviour
 
     private void OnDestroy()
     {
+        targetManager = TargetManager.Instance;
         targetManager.RemoveTarget(this);
     }
 
@@ -65,7 +69,6 @@ public class Target : MonoBehaviour
 
     private void OnBecameInvisible()
     {
-
         //본인이 현재 타깃인 경우 시간 지연 후 제거
         //본인이 현재 타깃이 아닌 경우 즉시 제거
         //if (targetManager.CurrentTarget == this){}

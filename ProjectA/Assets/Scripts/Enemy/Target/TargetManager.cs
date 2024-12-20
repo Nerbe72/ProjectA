@@ -17,6 +17,7 @@ public class TargetManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            GameManager.dontDestroyObjects.Add(gameObject);
         }
         else
         {
@@ -88,7 +89,7 @@ public class TargetManager : MonoBehaviour
     }
     #endregion
 
-    /// <param name="_camera">대상이 되는 카메라</param>
+    /// <param name="_camera">이 카메라를 중심으로 연산됨</param>
     public void SetTarget(Transform _camera)
     {
         int m_count = onSightTargets.Count;
