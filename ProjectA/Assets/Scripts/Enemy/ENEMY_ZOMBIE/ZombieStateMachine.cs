@@ -43,6 +43,7 @@ public class ZombieStateMachine
         CurrentState.Exit();
         CurrentState = _nextState;
         _nextState.Enter();
+        owner.IsWaiting = true;
     }
 
     public void Update()

@@ -69,7 +69,10 @@ public class TargetController : MonoBehaviour
             }
         }
 
-        if (targetManager.CurrentTarget == null) return;
+        if (targetManager.CurrentTarget == null)
+        {
+            cameraManager.SetFollow(CameraType.POV);
+        }
 
         switch (playerInput.targetWheel)
         {

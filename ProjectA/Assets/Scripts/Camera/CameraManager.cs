@@ -51,10 +51,15 @@ public class CameraManager : MonoBehaviour
 
     public void ResetCameraPosition(Scene _scene, LoadSceneMode _mode)
     {
-        for (int i = 0; i < vCams.Count; i++)
+        try
         {
-            vCams[i].GetComponent<CinemachineVirtualCamera>().ForceCameraPosition(PlayerController.Instance.transform.position, PlayerController.Instance.transform.rotation);
+            for (int i = 0; i < vCams.Count; i++)
+            {
+                vCams[i].GetComponent<CinemachineVirtualCamera>().ForceCameraPosition(PlayerController.Instance.transform.position, PlayerController.Instance.transform.rotation);
+            }
         }
+        catch { }
+        
     }
 
     public void ResetMousePosition(Scene _scene, LoadSceneMode _mode)

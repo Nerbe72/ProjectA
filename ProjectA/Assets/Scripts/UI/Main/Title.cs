@@ -47,6 +47,9 @@ public class Title : MonoBehaviour
         newgameBtn.clicked += () => { newgameAnswer.style.display = DisplayStyle.Flex; };
         newgameYesBtn.clicked += NewgameYes;
         newgameNoBtn.clicked += () => { newgameAnswer.style.display = DisplayStyle.None; };
+
+        continueBtn.clicked += Continue;
+        quitBtn.clicked += Quit;
     }
 
     private void NewgameYes()

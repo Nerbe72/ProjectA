@@ -48,7 +48,7 @@ public class Enemy : MonoBehaviour
     /// </summary>
     protected bool isHitting = false;
 
-    private void Start()
+    protected virtual void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();

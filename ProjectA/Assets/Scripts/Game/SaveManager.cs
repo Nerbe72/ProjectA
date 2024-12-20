@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using Unity.Serialization.Json;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class SaveManager : MonoBehaviour
 {
@@ -14,7 +15,7 @@ public class SaveManager : MonoBehaviour
     private Stat currentStatIncreased = new Stat();
     private int currentSaveSlot;
 
-    private List<BossState> bossStates;
+    private List<BossState> bossStates = new List<BossState>();
 
     private string defaultDataPath;
     private string bossPath;
@@ -63,7 +64,7 @@ public class SaveManager : MonoBehaviour
             tempStat.WeaponID = 1000;
             tempStat.MagicID = 10000;
             tempStat.MapName = "Stage1";
-            tempStat.SpawnPoint = new Vector3(18.6f, 0, 7.14f);
+            tempStat.SpawnPoint = new Vector3(18.6f, 0.05f, 7.14f);
         }
         else
         {
@@ -96,8 +97,10 @@ public class SaveManager : MonoBehaviour
         if (File.Exists(bossPath))
             File.Delete(bossPath);
 
-        LoadPlayerStat();
-        LoadBossStateData();
+        currentStat = LoadPlayerStat();
+        SavePlayerStat();
+        bossStates = LoadBossStateData();
+        SaveBossStateData();
     }
 
     public Stat GetPlayerStat()
@@ -129,8 +132,8 @@ public class SaveManager : MonoBehaviour
         {
             string json = File.ReadAllText(bossPath);
 
-            List<BossState> wrap = JsonUtility.FromJson<List<BossState>>(json);
-            return wrap;
+            BossStateWrapper wrap = JsonUtility.FromJson<BossStateWrapper>(json);
+            return wrap.BOSS_STATES;
         }
     }
 
@@ -151,20 +154,30 @@ public class SaveManager : MonoBehaviour
     /// <returns></returns>
     public BossState GetBossState(int _id)
     {
-        BossState current = new BossState(_id, false);
-
-        if (bossStates == null) return current;
+        BossState current = null;
 
         foreach (var bs in bossStates)
         {
             if (bs.ID == _id) current = bs;
         }
 
+        if (current == null)
+        {
+            current = new BossState(_id, false);
+            bossStates.Add(current);
+        }
+
         return current;
     }
 
-    public void SetBossState(int _id, bool _isDeath = false)
+    public void SetBossState(int _id, Vector3 _position, string _scene = "", bool _isDeath = false)
     {
+        if (_isDeath)
+        {
+            currentStat.MapName = _scene;
+            currentStat.SpawnPoint = _position;
+        }
+
         int count = bossStates.Count;
         bool isContains = false;
         for (int i = 0; i < count; i++)
@@ -172,7 +185,6 @@ public class SaveManager : MonoBehaviour
             if (bossStates[i].ID == _id)
             {
                 bossStates[i].IsDeath = _isDeath;
-                Debug.Log(bossStates[i].IsDeath);
                 isContains = true;
                 break;
             }
@@ -180,6 +192,7 @@ public class SaveManager : MonoBehaviour
         if (!isContains)
             bossStates.Add(new BossState(_id, _isDeath));
 
+        SavePlayerStat();
         SaveBossStateData();
     }
 

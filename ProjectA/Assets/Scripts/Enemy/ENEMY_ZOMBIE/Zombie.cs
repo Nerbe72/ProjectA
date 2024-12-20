@@ -10,9 +10,13 @@ public class Zombie : Enemy
 
     public float destinationDistance { get { return 1.4f; } }
     public float distanceLimit { get { return 10f; } }
+    public bool IsWaiting { get; set; }
 
-    private void Awake()
+    private Coroutine fsmDelayCo;
+
+    protected override void Awake()
     {
+        base.Awake();
         transform.position = SpawnPoint;
         transform.rotation = SpawnRotation;
 
@@ -30,8 +34,16 @@ public class Zombie : Enemy
 
     private void Update()
     {
-        zombieStateMachine.Update();
         PlayAnimationWalk();
+
+        if (IsWaiting && fsmDelayCo == null)
+        {
+            fsmDelayCo = StartCoroutine(FSMDelay());
+            return;
+        }
+
+        if (!IsWaiting)
+            zombieStateMachine.Update();
     }
 
     public void ToggleAttackCollider()
@@ -58,5 +70,14 @@ public class Zombie : Enemy
             default:
                 break;
         }
+    }
+
+    private IEnumerator FSMDelay()
+    {
+        yield return new WaitForEndOfFrame();
+        yield return new WaitForEndOfFrame();
+        IsWaiting = false;
+        fsmDelayCo = null;
+        yield break;
     }
 }

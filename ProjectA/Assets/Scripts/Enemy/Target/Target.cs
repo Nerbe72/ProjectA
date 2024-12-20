@@ -27,7 +27,12 @@ public class Target : MonoBehaviour
 
     private void Update()
     {
-        transform.LookAt(cam.transform);
+        try
+        {
+            transform.LookAt(cam.transform);
+        }
+        catch { }
+        
     }
 
     private void OnTriggerEnter(Collider other)
