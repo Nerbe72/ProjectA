@@ -1,0 +1,24 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/Main/TitleButtons.uss?fileID=7433441132597879392&amp;guid=1491001aee2008b49ae5d5e3178121b3&amp;type=3#TitleButtons" />
+    <ui:VisualElement style="flex-grow: 1;">
+        <ui:VisualElement name="Title" style="flex-grow: 0.25; -unity-text-align: upper-left; align-items: center; justify-content: center;">
+            <ui:Label tabindex="-1" text="Knight Ascendant" parse-escape-sequences="true" display-tooltip-when-elided="true" name="TitleLabel" style="-unity-text-align: middle-center; font-size: 100%; -unity-font-style: bold; -unity-font-definition: initial; -unity-font: resource(&apos;Fonts/KoddiUDOnGothic-Bold&apos;); color: rgb(87, 0, 0);" />
+        </ui:VisualElement>
+        <ui:VisualElement style="flex-grow: 0.75; align-items: center; justify-content: center; -unity-text-align: upper-left;">
+            <ui:VisualElement style="flex-grow: 0; align-items: stretch; justify-content: space-around; height: 60%; width: 20%;">
+                <ui:Button text="New Game" parse-escape-sequences="true" display-tooltip-when-elided="true" name="newgame" class="title-button" style="align-items: center; justify-content: center; -unity-font-style: bold; flex-shrink: 1; background-color: rgba(0, 0, 0, 0);" />
+                <ui:Button text="Continue" parse-escape-sequences="true" display-tooltip-when-elided="true" name="continue" class="title-button" style="font-size: 40%;" />
+                <ui:Button text="Quit" parse-escape-sequences="true" display-tooltip-when-elided="true" name="quit" class="title-button" style="font-size: 40%;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="newgame_answer" style="flex-grow: 1; position: absolute; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.94); display: none; align-items: center;">
+        <ui:VisualElement style="flex-grow: 0.4; align-items: center; justify-content: flex-end;">
+            <ui:Label tabindex="-1" text="저장된 데이터가 소멸됩니다.&#10;다시 시작하시겠습니까?" parse-escape-sequences="true" display-tooltip-when-elided="true" style="color: rgb(255, 0, 0); font-size: 70%; align-items: center; justify-content: center; -unity-text-align: upper-center; -unity-background-image-tint-color: rgba(255, 255, 255, 0); -unity-text-outline-width: 1px; -unity-font-style: bold;" />
+        </ui:VisualElement>
+        <ui:VisualElement style="flex-grow: 0.6; flex-direction: row; align-items: flex-start; justify-content: space-around; width: 100%; margin-top: 0; padding-right: 20%; padding-left: 20%; padding-top: 10%;">
+            <ui:Button text="Yes" parse-escape-sequences="true" display-tooltip-when-elided="true" name="newgame_yes" class="title-button" />
+            <ui:Button text="No" parse-escape-sequences="true" display-tooltip-when-elided="true" name="newgame_no" class="title-button" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

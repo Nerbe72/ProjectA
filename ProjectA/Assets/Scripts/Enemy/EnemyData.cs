@@ -6,6 +6,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Data", menuName = "ScriptableObjects/EnemyStatData", order = 1)]
 public class EnemyData : ScriptableObject
 {
+    public int ID;
     public string Name;
     [Tooltip("보스인 경우 조우시 체력바 표시")] public bool IsBoss;
 

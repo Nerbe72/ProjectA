@@ -5,6 +5,7 @@ using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public enum ScavengerAttackType
@@ -39,7 +40,6 @@ public class Scavenger : Enemy
 
     private bool isChase = false;
     private bool isAttack = false;
-    private bool isRetreating = false;
     private bool isMovingRight = true;
     private bool isEvading = false;
 
@@ -71,6 +71,8 @@ public class Scavenger : Enemy
     [SerializeField] private Canvas bossUICanvas;
     [SerializeField] private TMP_Text bossName;
     [SerializeField] private Slider bossHealthSlider;
+    [Header("ÄÆ¾À")]
+    [SerializeField] private GameObject trigger;
     [Header("Debug")]
     [SerializeField] private TMP_Text text;
 
@@ -79,6 +81,29 @@ public class Scavenger : Enemy
 
     private Coroutine healthCo;
     private float healthTemp = 0f;
+
+    protected override void Awake()
+    {
+        BossState state = SaveManager.Instance.GetBossState(enemyStat.ID);
+        if (state.IsDeath)
+        {
+            //FlagDeath();
+            trigger.SetActive(false);
+            Destroy(gameObject);
+            return;
+        }
+        trigger.SetActive(true);
+        base.Awake();
+        bossHealthSlider.maxValue = currentHp;
+        bossHealthSlider.value = currentHp;
+        bossName.text = enemyStat.Name;
+    }
+
+    private void Start()
+    {
+        //»ç¸ÁµÇÁö ¾ÊÀº °æ¿ì ºñ»ç¸Á Ã³¸®(Á¶¿ì Ã¼Å©)
+        SaveManager.Instance.SetBossState(enemyStat.ID, Vector3.zero);
+    }
 
     private void Update()
     {
@@ -105,15 +130,6 @@ public class Scavenger : Enemy
         Vector3 localVelocity = transform.InverseTransformDirection(agent.velocity);
         animator.SetFloat(ScavengerHash.Walk, Mathf.Lerp(animator.GetFloat(ScavengerHash.Walk), localVelocity.z, Time.deltaTime * 3f));
         animator.SetFloat(ScavengerHash.Side, Mathf.Lerp(animator.GetFloat(ScavengerHash.Side), localVelocity.x, Time.deltaTime * 3f));
-        Debug.Log($"{animator.GetFloat(ScavengerHash.Walk)} , {animator.GetFloat(ScavengerHash.Side)}");
-    }
-
-    protected override void InitStat()
-    {
-        base.InitStat();
-        bossHealthSlider.maxValue = currentHp;
-        bossHealthSlider.value = currentHp;
-        bossName.text = enemyStat.Name;
     }
 
     protected override void InitForChild()
@@ -159,10 +175,10 @@ public class Scavenger : Enemy
                     new ActionNode(DoChase)
                 })
             }),
-            new Sequence(new List<Node>
-            {
-                new ActionNode(PatternCooldown)
-            })
+            //new Sequence(new List<Node>
+            //{
+            //    new ActionNode(PatternCooldown)
+            //})
         });
     }
 
@@ -368,16 +384,6 @@ public class Scavenger : Enemy
         isAttack = false;
     }
 
-    public void SetRetreating()
-    {
-        isRetreating = true;
-    }
-
-    public void ResetRetreating()
-    {
-        isRetreating = false;
-    }
-
     public void Stop()
     {
         agent.velocity = Vector3.zero;
@@ -418,9 +424,20 @@ public class Scavenger : Enemy
         }
     }
 
+    public void DestroyDeath()
+    {
+        FlagDeath();
+        Destroy(gameObject, 0.5f);
+    }
+
     public void FlagDeath()
     {
-        //¿ÀºêÁ§Æ® Á¦°Å ¹× »ç¸ÁÃ³¸®
+        SaveManager.Instance.SetBossState(
+            enemyStat.ID,
+            SpawnPoint,
+            SceneManager.GetActiveScene().name, 
+            true);
+        //ÈÄ¼Ó ÄÆ¾À?
     }
 
     private IEnumerator HpBarLerp()

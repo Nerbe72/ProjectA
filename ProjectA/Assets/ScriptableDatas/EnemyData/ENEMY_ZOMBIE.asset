@@ -12,12 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7c9ee6b35577204f8319d813ea7e226, type: 3}
   m_Name: ENEMY_ZOMBIE
   m_EditorClassIdentifier: 
+  ID: 0
   Name: 
   IsBoss: 0
   sightAngle: 137
   sightDistance: 7
   sightHeight: {x: 0, y: 1.65, z: 0}
-  Hp: 0
+  Hp: 200
   AttackTypes:
   - MeleeDamage: 120
     MagicDamage: 0

@@ -17,6 +17,7 @@ public class HealthIndicator : MonoBehaviour, IStatObserver
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            GameManager.dontDestroyObjects.Add(gameObject);
         }
         else
         {

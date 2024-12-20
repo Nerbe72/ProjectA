@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class TargetController : MonoBehaviour
 {
+    public static TargetController Instance;
     /*
      * 필요한 정보
      * targetManager
@@ -23,6 +24,21 @@ public class TargetController : MonoBehaviour
     private TargetManager targetManager;
     private CameraManager cameraManager;
     private PlayerInput playerInput;
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+            GameManager.dontDestroyObjects.Add(gameObject);
+        } else
+        {
+            Destroy(gameObject);
+            Destroy(this);
+            return;
+        }
+    }
 
     private void Start()
     {
@@ -53,7 +69,10 @@ public class TargetController : MonoBehaviour
             }
         }
 
-        if (targetManager.CurrentTarget == null) return;
+        if (targetManager.CurrentTarget == null)
+        {
+            cameraManager.SetFollow(CameraType.POV);
+        }
 
         switch (playerInput.targetWheel)
         {

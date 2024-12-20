@@ -48,7 +48,7 @@ public class Enemy : MonoBehaviour
     /// </summary>
     protected bool isHitting = false;
 
-    private void Start()
+    protected virtual void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
@@ -98,18 +98,17 @@ public class Enemy : MonoBehaviour
     protected virtual void InitStat()
     {
         currentHp = enemyStat.Hp;
-        Debug.Log($"{name} : {currentHp}");
         currentDefense = enemyStat.MeleeDefense;
     }
 
     public bool CheckPlayerDistanceIn(float _dist)
     {
-        return _dist >= Vector3.Distance(player.transform.position, transform.position);
+        return _dist * _dist >= (player.transform.position - transform.position).sqrMagnitude;
     }
 
     public bool CheckSpawnDistanceOut(float _dist)
     {
-        return _dist <= Vector3.Distance(SpawnPoint, transform.position);
+        return _dist * _dist <= (SpawnPoint - transform.position).sqrMagnitude;
     }
 
     /// <summary>

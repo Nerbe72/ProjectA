@@ -8,8 +8,7 @@ public class PlayerStat : MonoBehaviour
     public static PlayerStat Instance;
 
     [Header("스탯 데이터")]
-    //추후 serializefield 제거(디버깅)
-    [SerializeField] private Stat stats;
+    private Stat stats;
 
     public int currentHealth;
     public int currentSouls;
@@ -24,8 +23,7 @@ public class PlayerStat : MonoBehaviour
 
     private void Start()
     {
-        //테스트용
-        stats = SaveManager.Instance.GetRegularStat();
+        stats = SaveManager.Instance.GetPlayerStat();
         Init();
     }
 

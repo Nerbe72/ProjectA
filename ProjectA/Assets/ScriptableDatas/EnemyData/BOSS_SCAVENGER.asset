@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7c9ee6b35577204f8319d813ea7e226, type: 3}
   m_Name: BOSS_SCAVENGER
   m_EditorClassIdentifier: 
+  ID: 9000
   Name: Scavenger
   IsBoss: 1
   sightAngle: 0

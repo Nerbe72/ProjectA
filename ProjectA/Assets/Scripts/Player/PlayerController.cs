@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
@@ -23,6 +25,7 @@ public class PlayerController : MonoBehaviour
     private CharacterController characterController;
 
     [SerializeField] private GameObject followThis;
+    public GameObject resetPosition;
     #endregion
 
     #region 변수
@@ -54,7 +57,10 @@ public class PlayerController : MonoBehaviour
     WaitForSeconds hurtWait = new WaitForSeconds(1f);
     private Coroutine c_dodgeHolder;
     private Coroutine c_hurtHolder;
+    private Coroutine c_spawnHolder;
     #endregion
+
+    private bool isMoveWait = false;
 
     void Awake()
     {
@@ -62,6 +68,7 @@ public class PlayerController : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            GameManager.dontDestroyObjects.Add(gameObject);
         } else
         {
             Destroy(gameObject);
@@ -77,6 +84,13 @@ public class PlayerController : MonoBehaviour
 
         PlayerStat.Instance = playerStat;
         PlayerInput.Instance = playerInput;
+
+        SceneManager.sceneLoaded += WaitGravity;
+    }
+
+    private void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= WaitGravity;
     }
 
     private void Start()
@@ -89,6 +103,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        if (isMoveWait) return;
         if (refuseAllInput) return;
 
         ReadInputDodge();
@@ -99,6 +114,7 @@ public class PlayerController : MonoBehaviour
     {
         CheckGround();
 
+        if (isMoveWait) return;
         if (refuseAllInput) return;
 
         Rotation();
@@ -114,6 +130,13 @@ public class PlayerController : MonoBehaviour
         Gizmos.DrawLine(transform.position, transform.position + (Vector3.down * characterController.height * 0.001f));
     }
 #endif
+
+    private void WaitGravity(Scene _scene, LoadSceneMode _mode)
+    {
+        if (c_spawnHolder != null)
+            StopCoroutine(c_spawnHolder);
+        c_spawnHolder = StartCoroutine(LoadingWait());
+    }
 
     #region Actions
     private void CheckGround()
@@ -348,4 +371,15 @@ public class PlayerController : MonoBehaviour
         
     }
     #endregion
+
+    private IEnumerator LoadingWait()
+    {
+        isMoveWait = true;
+        yield return new WaitForEndOfFrame();
+        yield return new WaitForSecondsRealtime(2f);
+        yield return new WaitForEndOfFrame();
+        isMoveWait = false;
+
+        yield break;
+    }
 }

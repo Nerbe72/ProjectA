@@ -13,6 +13,7 @@ public class ZombieHurtState : IState
 
     public void Enter()
     {
+        enemy.agent.SetDestination(enemy.transform.position);
         enemy.PlayAnimationHurt();
     }
 
@@ -35,6 +36,7 @@ public class ZombieHurtState : IState
         }
 
         //¿Ãµø
-        enemy.zombieStateMachine.TransitionTo(enemy.zombieStateMachine.moveState);
+        if (!enemy.CheckPlayerDistanceIn(1.5f))
+            enemy.zombieStateMachine.TransitionTo(enemy.zombieStateMachine.moveState);
     }
 }
